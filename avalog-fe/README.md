@@ -1,59 +1,114 @@
-# AvalogFe
+# 🏰 Avalog - Avalon Hub
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.19.
+**Avalog** è una web app pensata per tracciare e analizzare le tue sessioni di *Avalon*.
 
-## Development server
+Registra ogni partita, segna chi ha giocato quale ruolo, e lascia che i dati rivelino la verità
 
-To start a local development server, run:
+> Per gruppi che prendono il bluff sul serio.
 
+---
+
+## ✨ Funzionalità
+
+- 📝 **Registro partite** — Salva le partite con giocatori, ruoli ed esiti
+- 📊 **Dashboard statistiche** — Win rate, ruoli preferiti, andamento nel tempo
+- 🏆 **Classifiche** — Ranking globali e per ruolo
+- 👤 **Profili giocatore** — Tieni traccia della tua carriera su Avalon
+- 👥 **Gruppi** — Crea e gestisci i tuoi gruppi di gioco
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- Angular 19
+- Bootstrap 5
+- SCSS (tema medievale custom)
+
+### Backend
+- *Coming soon*
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisiti
+- Node.js v18.19+ o v20+
+- npm
+
+### Installazione
 ```bash
+# Clona il repository
+git clone https://github.com/[username]/Avalog---Avalon-Hub.git
+cd Avalog---Avalon-Hub
+
+# Installa dipendenze root (Husky, Commitizen)
+npm install
+
+# Installa dipendenze frontend
+cd avalog-fe
+npm install
+
+# Avvia il dev server
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+L'app sarà disponibile su `http://localhost:4200`
 
-## Code scaffolding
+---
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+## 📁 Struttura Progetto
+```
+Avalog---Avalon-Hub/
+├── avalog-fe/          # Frontend Angular
+├── avalog-be/          # Backend (coming soon)
+├── .husky/             # Git hooks
+├── REQUIREMENTS.md     # Requisiti funzionali
+├── ARCHITECTURE.md     # Documentazione tecnica
+├── CONTRIBUTING.md     # Guida alla contribuzione
+└── README.md
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
-```bash
-ng generate --help
-```
+## 📖 Documentazione
 
-## Building
+| Documento                             | Descrizione |
+|---------------------------------------|-------------|
+| [REQUIREMENTS.md](../REQUIREMENTS.md) | Requisiti funzionali del progetto |
+| [ARCHITECTURE.md](../ARCHITECTURE.md) | Architettura frontend |
+| [CONTRIBUTING.md](../CONTRIBUTING.md) | Guida per contribuire |
 
-To build the project run:
+---
 
-```bash
-ng build
-```
+## 🤝 Contribuire
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Leggi la [guida alla contribuzione](../CONTRIBUTING.md) per i dettagli su:
+- Git hooks e linting
+- Standard per i commit
+- Workflow di sviluppo
 
-## Running unit tests
+---
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## 📜 Licenza
 
-```bash
-ng test
-```
+*Da definire*
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
+## 🎲 Ruoli Avalon Supportati
 
-```bash
-ng e2e
-```
+### Fazione Buoni
+- **Merlino** — Conosce i cattivi (tranne Mordred)
+- **Percival** — Conosce Merlino
+- **Fedeli di Artù** — Nessuna informazione speciale
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### Fazione Cattivi
+- **Assassino** — Può assassinare Merlino
+- **Morgana** — Appare come Merlino a Percival
+- **Mordred** — Invisibile a Merlino
+- **Oberon** — Non conosce gli altri cattivi
 
-## Additional Resources
+---
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+*Sviluppato con ⚔️ per i fan di Avalon*
