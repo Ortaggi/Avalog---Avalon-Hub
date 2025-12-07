@@ -37,7 +37,7 @@ export class GroupService {
   }
 
   getByUserId(userId: string): Group[] | undefined {
-    return this.groups.filter((g) => g.memeberIds.includes(userId));
+    return this.groups.filter((g) => g.memberIds.includes(userId));
   }
 
   // Omit<TipoOriginale, 'proprietà1' | 'proprietà2'> per creare un nuovo tipo senza alcune proprieta`
@@ -57,7 +57,7 @@ export class GroupService {
   joinByCode(inviteCode: string, userId: string): Group | undefined {
     const group = this.groups.find((g) => g.inviteCode === inviteCode);
     if (group && !group.memberIds.includes(userId)) {
-      group.memberIds.add(userId);
+      group.memberIds.push(userId);
     }
     return group;
   }

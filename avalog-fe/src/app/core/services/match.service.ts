@@ -12,12 +12,12 @@ export class MatchService {
       groupId: '1',
       date: new Date('2024-06-01'),
       players: [
-        { userId: '1', roleId: 'merlin' },
-        { userId: '2', roleId: 'percival' },
-        { userId: '3', roleId: 'loyal' },
-        { userId: '4', roleId: 'loyal' },
-        { userId: '5', roleId: 'assassin' },
-        { userId: '6', roleId: 'morgana' }
+        { idPlayer: '1', idRole: 'merlin' },
+        { idPlayer: '2', idRole: 'percival' },
+        { idPlayer: '3', idRole: 'loyal' },
+        { idPlayer: '4', idRole: 'loyal' },
+        { idPlayer: '5', idRole: 'assassin' },
+        { idPlayer: '6', idRole: 'morgana' }
       ],
       winningFaction: 'good',
       victoryType: 'missions',
@@ -29,12 +29,12 @@ export class MatchService {
       groupId: '1',
       date: new Date('2024-06-08'),
       players: [
-        { userId: '1', roleId: 'loyal' },
-        { userId: '2', roleId: 'merlin' },
-        { userId: '3', roleId: 'percival' },
-        { userId: '4', roleId: 'assassin' },
-        { userId: '5', roleId: 'mordred' },
-        { userId: '6', roleId: 'loyal' }
+        { idPlayer: '1', idRole: 'loyal' },
+        { idPlayer: '2', idRole: 'merlin' },
+        { idPlayer: '3', idRole: 'percival' },
+        { idPlayer: '4', idRole: 'assassin' },
+        { idPlayer: '5', idRole: 'mordred' },
+        { idPlayer: '6', idRole: 'loyal' }
       ],
       winningFaction: 'evil',
       victoryType: 'assassination',
@@ -47,7 +47,7 @@ export class MatchService {
     return this.matches;
   }
 
-  getById(id: string): Match {
+  getById(id: string): Match | undefined {
     return this.matches.find((m) => m.id === id);
   }
 
@@ -57,7 +57,7 @@ export class MatchService {
 
   // Array.some(): ritorna true se trova qualcosa che matcha
   getByUserId(userId: string): Match[] {
-    return this.matches.filter((m) => m.players.some((p) => p.userId === userId));
+    return this.matches.filter((m) => m.players.some((p) => p.idRole === userId));
   }
 
   create(match: Omit<Match, 'id' | 'createdAt'>): Match {
@@ -81,12 +81,12 @@ export class MatchService {
 
   //TODO: Aggiungo qualche funzione helper, ma da valutare se va spostata in un service a se
 
-  getPlayerRole(match: Match, playerId: string): Role {
-    const player = match.players.find((p) => p.id === playerId);
+  getPlayerRole(match: Match, playerId: string): Role | undefined {
+    const player = match.players.find((p) => p.idRole === playerId);
     if (!player) {
       return undefined;
     }
-    return AVALON_ROLES.find((ar: Role) => ar.roleId === player.roleId);
+    return AVALON_ROLES.find((ar: Role) => ar.id === player.idRole);
   }
 
   didPlayerWin(match: Match, userId: string): boolean {

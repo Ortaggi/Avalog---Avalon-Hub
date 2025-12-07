@@ -5,7 +5,7 @@ import { User } from '../models';
   providedIn: 'root'
 })
 export class AuthService {
-  private currentUser = signal<User>(null);
+  private currentUser = signal<User | null>(null);
   isAuthenticated = signal<boolean>(false);
 
   // MOCK
