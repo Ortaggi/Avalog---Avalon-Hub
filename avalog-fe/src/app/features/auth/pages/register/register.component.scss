@@ -1,0 +1,100 @@
+@use '../../../../../styles/variables' as vars;
+
+.register-container {
+  min-height: calc(100vh - 100px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.register-card {
+  background-color: vars.$bg-medium;
+  border: 1px solid vars.$accent-gold;
+  border-radius: 8px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  h1 {
+    color: vars.$accent-gold;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: vars.$text-muted;
+    margin: 0;
+  }
+}
+
+.form-label {
+  color: vars.$text-light;
+  font-weight: 500;
+}
+
+.form-control {
+  background-color: vars.$bg-light;
+  border: 1px solid vars.$bg-light;
+  color: vars.$text-light;
+
+  &::placeholder {
+    color: vars.$text-muted;
+  }
+
+  &:focus {
+    background-color: vars.$bg-light;
+    border-color: vars.$accent-gold;
+    color: vars.$text-light;
+    box-shadow: 0 0 0 0.2rem rgba(vars.$accent-gold, 0.25);
+  }
+}
+
+.btn-primary {
+  background-color: vars.$primary;
+  border-color: vars.$primary;
+  padding: 0.75rem;
+  font-weight: 600;
+
+  &:hover:not(:disabled) {
+    background-color: darken(vars.$primary, 10%);
+    border-color: darken(vars.$primary, 10%);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+.register-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid vars.$bg-light;
+
+  p {
+    color: vars.$text-muted;
+    margin: 0;
+  }
+
+  a {
+    color: vars.$accent-gold;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.alert-danger {
+  background-color: rgba(vars.$danger, 0.2);
+  border-color: vars.$danger;
+  color: vars.$text-light;
+}
