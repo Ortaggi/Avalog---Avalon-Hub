@@ -23,8 +23,13 @@ export class AuthService {
     return this.currentUser();
   }
 
-  login(): boolean {
-    return false;
+  // TODO: Al momento non gestisco la password
+  login(email: string): boolean {
+    if (this.mockedUser.email === email) {
+      this.currentUser.set(this.mockedUser);
+      this.isAuthenticated.set(true);
+    }
+    return this.isAuthenticated();
   }
 
   logout(): void {
@@ -32,7 +37,17 @@ export class AuthService {
     this.isAuthenticated.set(false);
   }
 
-  register(): boolean {
-    return false;
+  register(email: string, username: string): boolean {
+    const newUser: User = {
+      id: Date.now().toString(),
+      email,
+      username,
+      displayName: username,
+      createdAt: new Date()
+    };
+    this.currentUser.set(newUser);
+    this.isAuthenticated.set(true);
+
+    return true;
   }
 }
