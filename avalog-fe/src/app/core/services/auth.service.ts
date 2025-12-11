@@ -1,22 +1,14 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { User } from '../models';
+import { UserSqliteRepository } from '../repositories';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private userRepo = inject(UserSqliteRepository);
   private currentUser = signal<User | null>(null);
   isAuthenticated = signal<boolean>(false);
-
-  // MOCK
-  private mockedUser: User = {
-    id: '1',
-    email: 'diego.gettatelli@email.it',
-    username: 'dgett130',
-    displayName: 'Diego Gettatelli',
-    avatar: undefined,
-    createdAt: new Date('2025-12-06')
-  };
 
   // TODO: Capire se con i signal e` giusto o meno
   getCurrentUser(): User | null {
@@ -24,30 +16,62 @@ export class AuthService {
   }
 
   // TODO: Al momento non gestisco la password
-  login(email: string): boolean {
-    if (this.mockedUser.email === email) {
-      this.currentUser.set(this.mockedUser);
+  async login(email: string, password: string): Promise<boolean> {
+    const user = await this.userRepo.validatePassword(email, password);
+
+    if (user) {
+      this.currentUser.set(user);
       this.isAuthenticated.set(true);
+      sessionStorage.setItem('currentUserId', user.id);
+      return true;
     }
-    return this.isAuthenticated();
+
+    return false;
   }
 
   logout(): void {
     this.currentUser.set(null);
     this.isAuthenticated.set(false);
+    sessionStorage.removeItem('currentUserId');
   }
 
-  register(email: string, username: string): boolean {
-    const newUser: User = {
-      id: Date.now().toString(),
-      email,
-      username,
-      displayName: username,
-      createdAt: new Date()
-    };
-    this.currentUser.set(newUser);
-    this.isAuthenticated.set(true);
+  async register(
+    email: string,
+    username: string,
+    displayName: string,
+    password: string
+  ): Promise<boolean> {
+    try {
+      const existingMail = await this.userRepo.getByEmail(email);
+      if (existingMail) return false;
 
-    return true;
+      const existingUsername = await this.userRepo.getByUsername(username);
+      if (existingUsername) return false;
+
+      const user = await this.userRepo.create({
+        email,
+        username,
+        displayName,
+        password
+      });
+
+      this.currentUser.set(user);
+      this.isAuthenticated.set(true);
+      sessionStorage.setItem('currentUserId', user.id);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async restoreSession(): Promise<void> {
+    const userId = sessionStorage.getItem('currentUserId');
+    if (userId) {
+      const user = await this.userRepo.getById(userId);
+      if (user) {
+        this.currentUser.set(user);
+        this.isAuthenticated.set(true);
+      }
+    }
   }
 }

@@ -1,12 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import {
-  AVALON_ROLES,
-  FactionStats,
-  LeaderboardEntry,
-  PlayerStats,
-  Role,
-  RoleStats
-} from '../models';
+import { PlayerStats, FactionStats, RoleStats, LeaderboardEntry, AVALON_ROLES } from '../models';
 import { MatchService } from './match.service';
 import { UserService } from './user.service';
 
@@ -14,52 +7,45 @@ import { UserService } from './user.service';
   providedIn: 'root'
 })
 export class StatsService {
-  private userService = inject(UserService);
   private matchService = inject(MatchService);
+  private userService = inject(UserService);
 
-  //TODO: Da capire quanta logica di calcolo delle statistiche rimarra` qui.. probabilmente poca ✍️(◔◡◔)
-
-  // Statistiche personali
-  getPlayerStats(userId: string): PlayerStats {
-    //Recupero i match del giocatore
-    const matches = this.matchService.getByUserId(userId);
+  async getPlayerStats(userId: string): Promise<PlayerStats> {
+    const matches = await this.matchService.getByUserId(userId);
 
     let totalWins = 0;
     const factionStats: FactionStats = {
       good: { played: 0, wins: 0, winRate: 0 },
       evil: { played: 0, wins: 0, winRate: 0 }
     };
-
-    // Mi serve per mettere in correlazione i ruoli e le vittorie
     const roleStatsMap = new Map<string, { played: number; wins: number }>();
-    AVALON_ROLES.forEach((role: Role) => {
+
+    // Inizializzo tutti i ruoli
+    AVALON_ROLES.forEach((role) => {
       roleStatsMap.set(role.id, { played: 0, wins: 0 });
     });
 
-    // Comincio il calcolo delle statistiche
+    // Calcolo le statistiche
     matches.forEach((match) => {
       const role = this.matchService.getPlayerRole(match, userId);
-      if (!role) {
-        return;
-      }
+      if (!role) return;
 
       const won = this.matchService.didPlayerWin(match, userId);
 
-      // Statistiche fazione
+      // Aggiorno le statistiche fazione
       factionStats[role.faction].played++;
       if (won) {
         factionStats[role.faction].wins++;
         totalWins++;
       }
 
-      //Statistiche del ruolo
-      roleStatsMap.get(role.id)!.played++;
-      if (won) {
-        roleStatsMap.get(role.id)!.wins++;
-      }
+      // Aggiorno le statistiche ruolo
+      const roleStat = roleStatsMap.get(role.id)!;
+      roleStat.played++;
+      if (won) roleStat.wins++;
     });
 
-    //Calcolo i win rate
+    // Calcolo i win rate fazioni
     factionStats.good.winRate =
       factionStats.good.played > 0
         ? Math.round((factionStats.good.wins / factionStats.good.played) * 100)
@@ -69,34 +55,30 @@ export class StatsService {
         ? Math.round((factionStats.evil.wins / factionStats.evil.played) * 100)
         : 0;
 
-    //Calcolo i winrate e aggiungo qualche dato
+    // Converto i role stats e calcolo win rate
     const roleStats: RoleStats[] = [];
-    // Most Played Role
-    let mpr = '';
-    // Most Played Count (quante volte ho giocato il mpr)
-    let mpc = 0;
-    // Best role
+    let mostPlayedRole = '';
+    let mostPlayedCount = 0;
     let bestRole = '';
     let bestWinRate = 0;
 
-    // TODO: Da capire perche riconosce l'ordine dei parametri che inserisco... (＃°Д°)
     roleStatsMap.forEach((stats, roleId) => {
       const winRate = stats.played > 0 ? Math.round((stats.wins / stats.played) * 100) : 0;
 
       roleStats.push({
-        roleId: roleId,
+        roleId,
         played: stats.played,
         wins: stats.wins,
-        winRate: winRate
+        winRate
       });
 
-      //Aggiorno il mpc
-      if (stats.played > mpc) {
-        mpc = stats.played;
-        mpr = roleId;
+      if (stats.played > mostPlayedCount) {
+        mostPlayedCount = stats.played;
+        mostPlayedRole = roleId;
       }
 
-      if (winRate > bestWinRate) {
+      // Best role: almeno 2 partite giocate
+      if (stats.played >= 2 && winRate > bestWinRate) {
         bestWinRate = winRate;
         bestRole = roleId;
       }
@@ -109,19 +91,20 @@ export class StatsService {
       winRate: matches.length > 0 ? Math.round((totalWins / matches.length) * 100) : 0,
       winsByFaction: factionStats,
       winsByRole: roleStats.filter((r) => r.played > 0),
-      mostPlayedRole: mpr,
+      mostPlayedRole,
       bestRole
     };
   }
 
-  // Statistiche generali
-  getLeaderboard(): LeaderboardEntry[] {
-    const users = this.userService.getAll();
+  async getLeaderboard(minMatches = 1): Promise<LeaderboardEntry[]> {
+    const users = await this.userService.getAll();
 
-    const entries: LeaderboardEntry[] = users
-      .map((user) => {
-        const stats = this.getPlayerStats(user.id);
-        return {
+    const entries: LeaderboardEntry[] = [];
+
+    for (const user of users) {
+      const stats = await this.getPlayerStats(user.id);
+      if (stats.totalMatches >= minMatches) {
+        entries.push({
           rank: 0,
           userId: user.id,
           username: user.username,
@@ -130,16 +113,17 @@ export class StatsService {
           totalMatches: stats.totalMatches,
           totalWins: stats.totalWins,
           winRate: stats.winRate
-        };
-      })
-      .sort((a, b) => {
-        // Sorto prima per win rate,
-        // nel caso sia uguale do la priorita a quello con piu partite giocate
-        if (b.winRate !== a.winRate) return b.winRate - a.winRate;
-        return b.totalMatches - a.totalMatches;
-      });
+        });
+      }
+    }
 
-    // Assegno il rank una volta fatta la classifica
+    // Ordino per win rate, poi per numero partite
+    entries.sort((a, b) => {
+      if (b.winRate !== a.winRate) return b.winRate - a.winRate;
+      return b.totalMatches - a.totalMatches;
+    });
+
+    // Assegno il rank
     entries.forEach((entry, index) => {
       entry.rank = index + 1;
     });
@@ -147,29 +131,33 @@ export class StatsService {
     return entries;
   }
 
-  getRoleLeaderboard(roleId: string): LeaderboardEntry[] {
-    const users = this.userService.getAll();
+  async getRoleLeaderboard(roleId: string, minMatches = 1): Promise<LeaderboardEntry[]> {
+    const users = await this.userService.getAll();
 
-    const entries: LeaderboardEntry[] = users
-      .map((user) => {
-        const stats = this.getPlayerStats(user.id);
-        const roleStat = stats.winsByRole.find((rs: RoleStats) => rs.roleId === roleId);
+    const entries: LeaderboardEntry[] = [];
 
-        return {
+    for (const user of users) {
+      const stats = await this.getPlayerStats(user.id);
+      const roleStat = stats.winsByRole.find((r) => r.roleId === roleId);
+
+      if (roleStat && roleStat.played >= minMatches) {
+        entries.push({
           rank: 0,
           userId: user.id,
           username: user.username,
           displayName: user.displayName,
           avatar: user.avatar,
-          totalMatches: roleStat?.played || 0,
-          totalWins: roleStat?.wins || 0,
-          winRate: roleStat?.winRate || 0
-        };
-      })
-      .sort((a, b) => {
-        if (b.winRate !== a.winRate) return b.winRate - a.winRate;
-        return b.totalMatches - a.totalMatches;
-      });
+          totalMatches: roleStat.played,
+          totalWins: roleStat.wins,
+          winRate: roleStat.winRate
+        });
+      }
+    }
+
+    entries.sort((a, b) => {
+      if (b.winRate !== a.winRate) return b.winRate - a.winRate;
+      return b.totalMatches - a.totalMatches;
+    });
 
     entries.forEach((entry, index) => {
       entry.rank = index + 1;

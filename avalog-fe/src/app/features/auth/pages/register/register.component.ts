@@ -23,7 +23,7 @@ export class RegisterComponent {
   errorMessage = '';
   isLoading = false;
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     this.errorMessage = '';
 
     if (this.password !== this.confirmPassword) {
@@ -33,16 +33,23 @@ export class RegisterComponent {
 
     this.isLoading = true;
 
-    setTimeout(() => {
-      const success = this.authService.register(this.email, this.username);
+    try {
+      const success = await this.authService.register(
+        this.email,
+        this.username,
+        this.displayName,
+        this.password
+      );
 
       if (success) {
         this.router.navigate(['/dashboard']);
       } else {
-        this.errorMessage = 'Errore durante la registrazione';
+        this.errorMessage = 'Email o username già in uso';
       }
-
+    } catch {
+      this.errorMessage = 'Errore durante la registrazione';
+    } finally {
       this.isLoading = false;
-    }, 1000);
+    }
   }
 }

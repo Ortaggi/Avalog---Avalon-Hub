@@ -20,20 +20,22 @@ export class LoginComponent {
   errorMessage = '';
   isLoading = false;
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     this.errorMessage = '';
     this.isLoading = true;
 
-    // Simulo una chiamata
-    setTimeout(() => {
-      const success = this.authService.login(this.email);
+    try {
+      const success = await this.authService.login(this.email, this.password);
+
       if (success) {
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['dashboard']);
       } else {
         this.errorMessage = 'Credenziali non valide';
       }
-
+    } catch {
+      this.errorMessage = 'Errore durante il login';
+    } finally {
       this.isLoading = false;
-    }, 1000);
+    }
   }
 }

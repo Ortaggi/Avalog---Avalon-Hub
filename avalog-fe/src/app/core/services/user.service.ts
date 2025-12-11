@@ -1,44 +1,30 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { User } from '../models';
+import { UserSqliteRepository } from '../repositories';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  // Aggiungo alcuni utenti MOCK
-  private users: User[] = [
-    {
-      id: '1',
-      email: 'mariorossi@email.it',
-      username: 'mrossi66',
-      displayName: 'Mario Rossi',
-      createdAt: new Date('2024-12-01')
-    },
-    {
-      id: '2',
-      email: 'toniocartonio@email.it',
-      username: 'toniocartonio10',
-      displayName: 'Tonio Cartonio',
-      createdAt: new Date('2024-12-02')
-    },
-    {
-      id: '3',
-      email: 'ninofrassica@email.it',
-      username: 'ninofrassica1',
-      displayName: 'Tony New Star Dance 2000',
-      createdAt: new Date('2024-12-03')
-    }
-  ];
+  private userRepo = inject(UserSqliteRepository);
 
-  getAll(): User[] {
-    return this.users;
+  async getAll(): Promise<User[]> {
+    return this.userRepo.getAll();
   }
 
-  getById(id: string): User | undefined {
-    return this.users.find((u) => u.id === id);
+  async getById(id: string): Promise<User | null> {
+    return this.userRepo.getById(id);
   }
 
-  getByUsername(username: string): User | undefined {
-    return this.users.find((u) => u.username === username);
+  async getByUsername(username: string): Promise<User | null> {
+    return this.userRepo.getByUsername(username);
+  }
+
+  async update(id: string, userData: Partial<User>): Promise<User | null> {
+    return this.userRepo.update(id, userData);
+  }
+
+  async delete(id: string): Promise<boolean> {
+    return this.userRepo.delete(id);
   }
 }

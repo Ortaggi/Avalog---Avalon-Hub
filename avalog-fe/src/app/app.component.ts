@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SharedModule } from './shared/shared.module';
 import { AuthService } from './core/services';
@@ -10,7 +10,12 @@ import { AuthService } from './core/services';
   styleUrl: './app.component.scss',
   standalone: true
 })
-export class AppComponent {
-  authService: AuthService = inject(AuthService);
-  title = 'avalog-fe';
+export class AppComponent implements OnInit {
+  authService = inject(AuthService);
+  isReady = signal(false);
+
+  async ngOnInit(): Promise<void> {
+    await this.authService.restoreSession();
+    this.isReady.set(true);
+  }
 }

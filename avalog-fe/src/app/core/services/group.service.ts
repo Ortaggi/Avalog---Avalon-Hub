@@ -1,64 +1,51 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Group } from '../models';
+import { GroupSqliteRepository } from '../repositories';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GroupService {
-  // Aggiungo qualche gruppo mockato
-  // TODO: Da valutare l'inserimento di un JSON Server per mockare le chiamate direttamente
-  private groups: Group[] = [
-    {
-      id: '1',
-      name: 'Cavalieri della Tavola Rotonda',
-      description: '',
-      adminId: '1',
-      memberIds: ['1', '2'],
-      inviteCode: 'CAMELOT',
-      createdAt: new Date('2024-12-01')
-    },
-    {
-      id: '2',
-      name: 'Avalon Beginners',
-      description: 'Per chi sta imparando',
-      adminId: '2',
-      memberIds: ['2', '3'],
-      inviteCode: 'NEWBIE',
-      createdAt: new Date('2024-12-01')
+  private groupRepo = inject(GroupSqliteRepository);
+
+  async getAll(): Promise<Group[]> {
+    return this.groupRepo.getAll();
+  }
+
+  async getById(id: string): Promise<Group | null> {
+    return this.groupRepo.getById(id);
+  }
+
+  async getByUserId(userId: string): Promise<Group[]> {
+    return this.groupRepo.getByUserId(userId);
+  }
+
+  async create(group: Omit<Group, 'id' | 'createdAt'>): Promise<Group> {
+    return this.groupRepo.create(group);
+  }
+
+  async update(id: string, groupData: Partial<Group>): Promise<Group | null> {
+    return this.groupRepo.update(id, groupData);
+  }
+
+  async delete(id: string): Promise<boolean> {
+    return this.groupRepo.delete(id);
+  }
+
+  async joinByCode(code: string, userId: string): Promise<Group | null> {
+    const group = await this.groupRepo.getByInviteCode(code);
+    if (group) {
+      await this.groupRepo.addMember(group.id, userId);
+      return this.groupRepo.getById(group.id);
     }
-  ];
-
-  getAll(): Group[] | undefined {
-    return this.groups;
+    return null;
   }
 
-  getById(id: string): Group | undefined {
-    return this.groups.find((g) => g.id === id);
+  async addMember(groupId: string, userId: string): Promise<boolean> {
+    return this.groupRepo.addMember(groupId, userId);
   }
 
-  getByUserId(userId: string): Group[] | undefined {
-    return this.groups.filter((g) => g.memberIds.includes(userId));
-  }
-
-  // Omit<TipoOriginale, 'proprietà1' | 'proprietà2'> per creare un nuovo tipo senza alcune proprieta`
-  create(group: Omit<Group, 'id' | 'createdAt'>): Group {
-    const newGroup: Group = {
-      ...group,
-      id: Date.now().toString(), //TODO: Andra probabilmente sostituito con l'id generato a backend, al momento inserisco i millisecondi dall'epoch
-      createdAt: new Date()
-    };
-
-    //TODO: Andra sostituito con la chiamata effettiva
-    this.groups.push(newGroup);
-    return newGroup;
-  }
-
-  // TODO: L'invite code e` da ragionare... dovra` probabilmente essere generato randomicamente
-  joinByCode(inviteCode: string, userId: string): Group | undefined {
-    const group = this.groups.find((g) => g.inviteCode === inviteCode);
-    if (group && !group.memberIds.includes(userId)) {
-      group.memberIds.push(userId);
-    }
-    return group;
+  async removeMember(groupId: string, userId: string): Promise<boolean> {
+    return this.groupRepo.removeMember(groupId, userId);
   }
 }

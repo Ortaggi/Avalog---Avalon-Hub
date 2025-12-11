@@ -1,4 +1,4 @@
-// Importa le variabili custom
+// Importo le variabili custom
 @use 'styles/variables' as vars;
 
 // Override variabili Bootstrap PRIMA di importarlo
@@ -11,7 +11,7 @@ $info: vars.$info;
 $body-bg: vars.$bg-dark;
 $body-color: vars.$text-light;
 
-// Importa Bootstrap
+// Importo Bootstrap
 @use 'bootstrap/scss/bootstrap';
 
 // Stili globali custom
