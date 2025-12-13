@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import initSqlJs, { Database } from 'sql.js';
+import { Database } from 'sql.js';
+declare const initSqlJs: any;
 
 @Injectable({
   providedIn: 'root'
 })
 export class DatabaseService {
-  private db: Database | null = null;
+  private db!: Database;
   private initPromise: Promise<Database> | null = null;
   private readonly DB_KEY = 'avalog_local_db';
 
@@ -18,8 +19,7 @@ export class DatabaseService {
       return this.initPromise;
     }
 
-    this.initPromise = this.initDatabase();
-    return this.initPromise;
+    return this.initDatabase();
   }
 
   private async initDatabase(): Promise<Database> {
@@ -134,7 +134,6 @@ export class DatabaseService {
 
   clearDatabase(): void {
     localStorage.removeItem(this.DB_KEY);
-    this.db = null;
     this.initPromise = null;
   }
 }

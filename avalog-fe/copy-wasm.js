@@ -1,10 +1,10 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
-const wasmSource = path.join(__dirname, 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm');
-const wasmDest = path.join(__dirname, 'src', 'assets', 'sql-wasm.wasm');
+const wasmSource = path.join(__dirname, '..', 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm');
+const assetsDir = path.join(__dirname, '..', 'src', 'assets');
+const wasmDest = path.join(assetsDir, 'sql-wasm.wasm');
 
-const assetsDir = path.join(__dirname, 'src', 'assets');
 if (!fs.existsSync(assetsDir)) {
   fs.mkdirSync(assetsDir, {recursive: true});
 }
