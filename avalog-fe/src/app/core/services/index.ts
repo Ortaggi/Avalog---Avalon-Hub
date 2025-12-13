@@ -1,4 +1,5 @@
 export * from './database.service';
+export * from './supabase.service';
 export * from './auth.service';
 export * from './user.service';
 export * from './group.service';
