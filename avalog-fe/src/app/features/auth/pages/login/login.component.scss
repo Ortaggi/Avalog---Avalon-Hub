@@ -1,5 +1,23 @@
 @use '../../../../../styles/variables' as vars;
 
+.logo-container {
+  min-height: calc(100vh - 100px);
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  padding-left: 10rem;
+}
+
+.logo-card {
+  width: 100%;
+  max-width: 500px;
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
 .login-container {
   min-height: calc(100vh - 100px);
   display: flex;
