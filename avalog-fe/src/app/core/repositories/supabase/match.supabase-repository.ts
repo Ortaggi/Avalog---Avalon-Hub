@@ -30,7 +30,7 @@ export class MatchSupabaseRepository implements BaseRepository<Match> {
       .from('matches')
       .select('*')
       .eq('id', id)
-      .single();
+      .maybeSingle();
 
     if (error && error.code !== 'PGRST116') throw error;
     return data ? this.mapToMatch(data) : null;

@@ -26,7 +26,7 @@ export class UserSupabaseRepository implements BaseRepository<User> {
       .insert({
         email: entity.email,
         username: entity.username,
-        displayName: entity.displayName,
+        display_name: entity.displayName,
         password: entity.password,
         avatar: entity.avatar || null
       })
@@ -56,7 +56,7 @@ export class UserSupabaseRepository implements BaseRepository<User> {
       .from('users')
       .select('*')
       .eq('id', id)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data ? this.mapToUser(data) : null;
@@ -68,7 +68,7 @@ export class UserSupabaseRepository implements BaseRepository<User> {
 
     if (entity.avatar !== undefined) updatedData['avatar'] = entity.avatar;
     if (entity.email) updatedData['email'] = entity.email;
-    if (entity.displayName) updatedData['displayName'] = entity.displayName;
+    if (entity.displayName) updatedData['display_name'] = entity.displayName;
     if (entity.username) updatedData['username'] = entity.username;
 
     const { data, error } = await this.supabaseService
@@ -88,7 +88,7 @@ export class UserSupabaseRepository implements BaseRepository<User> {
       .select('*')
       .eq('email', email)
       .eq('password', password)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data ? this.mapToUser(data) : null;
@@ -99,7 +99,7 @@ export class UserSupabaseRepository implements BaseRepository<User> {
       .from('users')
       .select('*')
       .eq('email', email)
-      .single();
+      .maybeSingle();
 
     if (error && error.code !== 'PGRST116') throw error;
     return data ? this.mapToUser(data) : null;
@@ -110,7 +110,7 @@ export class UserSupabaseRepository implements BaseRepository<User> {
       .from('users')
       .select('*')
       .eq('username', username)
-      .single();
+      .maybeSingle();
 
     if (error && error.code !== 'PGRST116') throw error;
     return data ? this.mapToUser(data) : null;

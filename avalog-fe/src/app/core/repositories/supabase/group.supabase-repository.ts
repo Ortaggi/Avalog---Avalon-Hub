@@ -27,7 +27,7 @@ export class GroupSupabaseRepository implements BaseRepository<Group> {
       .from('groups')
       .select('*')
       .eq('id', id)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data ? this.mapToGroup(data) : null;
@@ -61,7 +61,7 @@ export class GroupSupabaseRepository implements BaseRepository<Group> {
       .from('groups')
       .select('*')
       .eq('invite_code', code)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data ? this.mapToGroup(data) : null;
