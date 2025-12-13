@@ -1,12 +1,27 @@
 import { inject, Injectable } from '@angular/core';
 import { AVALON_ROLES, Match, Role } from '../models';
-import { MatchSqliteRepository } from '../repositories';
+import { MatchSqliteRepository, MatchSupabaseRepository } from '../repositories';
+import { STORAGE_CONFIG } from '../config/storage.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MatchService {
-  private matchRepo = inject(MatchSqliteRepository);
+  private sqliteRepo = inject(MatchSqliteRepository);
+  private supabaseRepo = inject(MatchSupabaseRepository);
+
+  private get matchRepo() {
+    switch (STORAGE_CONFIG.type) {
+      case 'supabase':
+        return this.supabaseRepo;
+      case 'api':
+        return this.sqliteRepo;
+      case 'sqlite':
+        return this.sqliteRepo;
+      default:
+        return this.sqliteRepo;
+    }
+  }
 
   async getAll(): Promise<Match[]> {
     return this.matchRepo.getAll();

@@ -1,13 +1,27 @@
 import { inject, Injectable } from '@angular/core';
 import { Group } from '../models';
-import { GroupSqliteRepository } from '../repositories';
+import { GroupSqliteRepository, GroupSupabaseRepository } from '../repositories';
+import { STORAGE_CONFIG } from '../config/storage.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GroupService {
-  private groupRepo = inject(GroupSqliteRepository);
+  private sqliteRepo = inject(GroupSqliteRepository);
+  private supabaseRepo = inject(GroupSupabaseRepository);
 
+  private get groupRepo() {
+    switch (STORAGE_CONFIG.type) {
+      case 'supabase':
+        return this.supabaseRepo;
+      case 'api':
+        return this.sqliteRepo;
+      case 'sqlite':
+        return this.sqliteRepo;
+      default:
+        return this.sqliteRepo;
+    }
+  }
   async getAll(): Promise<Group[]> {
     return this.groupRepo.getAll();
   }

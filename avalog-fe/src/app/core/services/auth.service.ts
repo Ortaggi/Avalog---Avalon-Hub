@@ -1,21 +1,35 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { User } from '../models';
-import { UserSqliteRepository } from '../repositories';
+import { UserSqliteRepository, UserSupabaseRepository } from '../repositories';
+import { STORAGE_CONFIG } from '../config/storage.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private userRepo = inject(UserSqliteRepository);
+  private sqliteRepo = inject(UserSqliteRepository);
+  private supabaseRepo = inject(UserSupabaseRepository);
   private currentUser = signal<User | null>(null);
   isAuthenticated = signal<boolean>(false);
+
+  private get userRepo() {
+    switch (STORAGE_CONFIG.type) {
+      case 'supabase':
+        return this.supabaseRepo;
+      case 'api':
+        return this.sqliteRepo;
+      case 'sqlite':
+        return this.sqliteRepo;
+      default:
+        return this.sqliteRepo;
+    }
+  }
 
   // TODO: Capire se con i signal e` giusto o meno
   getCurrentUser(): User | null {
     return this.currentUser();
   }
 
-  // TODO: Al momento non gestisco la password
   async login(email: string, password: string): Promise<boolean> {
     const user = await this.userRepo.validatePassword(email, password);
 

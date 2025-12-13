@@ -1,12 +1,27 @@
 import { inject, Injectable } from '@angular/core';
 import { User } from '../models';
-import { UserSqliteRepository } from '../repositories';
+import { UserSqliteRepository, UserSupabaseRepository } from '../repositories';
+import { STORAGE_CONFIG } from '../config/storage.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private userRepo = inject(UserSqliteRepository);
+  private sqliteRepo = inject(UserSqliteRepository);
+  private supabaseRepo = inject(UserSupabaseRepository);
+
+  private get userRepo() {
+    switch (STORAGE_CONFIG.type) {
+      case 'supabase':
+        return this.supabaseRepo;
+      case 'api':
+        return this.sqliteRepo;
+      case 'sqlite':
+        return this.sqliteRepo;
+      default:
+        return this.sqliteRepo;
+    }
+  }
 
   async getAll(): Promise<User[]> {
     return this.userRepo.getAll();
