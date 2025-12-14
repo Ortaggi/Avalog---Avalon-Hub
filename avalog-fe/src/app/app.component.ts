@@ -15,7 +15,15 @@ export class AppComponent implements OnInit {
   isReady = signal(false);
 
   async ngOnInit(): Promise<void> {
+    // Piccolo delay per assicurarsi che tutto sia stato caricato
+    // TODO: Trovare un altro modo per aspettare. Il token non viene letto correttamente
+    await new Promise((resolve) => {
+      setTimeout(resolve, 100);
+    });
+    //console.log('Cookie attuale:', document.cookie);
+    //console.log('AppComponent ngOnInit - inizio restore');
     await this.authService.restoreSession();
+    //console.log('AppComponent ngOnInit - restore completato, isAuthenticated:', this.authService.isAuthenticated());
     this.isReady.set(true);
   }
 }
