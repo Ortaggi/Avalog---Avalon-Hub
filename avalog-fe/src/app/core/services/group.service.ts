@@ -1,13 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { Group } from '../models';
-import { GroupSqliteRepository, GroupSupabaseRepository } from '../repositories';
+import { GroupSupabaseRepository } from '../repositories';
 import { STORAGE_CONFIG } from '../config/storage.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GroupService {
-  private sqliteRepo = inject(GroupSqliteRepository);
   private supabaseRepo = inject(GroupSupabaseRepository);
 
   private get groupRepo() {
@@ -15,11 +14,11 @@ export class GroupService {
       case 'supabase':
         return this.supabaseRepo;
       case 'api':
-        return this.sqliteRepo;
+        return this.supabaseRepo;
       case 'sqlite':
-        return this.sqliteRepo;
+        return this.supabaseRepo;
       default:
-        return this.sqliteRepo;
+        return this.supabaseRepo;
     }
   }
   async getAll(): Promise<Group[]> {

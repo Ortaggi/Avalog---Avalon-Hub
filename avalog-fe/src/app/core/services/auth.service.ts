@@ -1,13 +1,12 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { User } from '../models';
-import { UserSqliteRepository, UserSupabaseRepository } from '../repositories';
+import { UserSupabaseRepository } from '../repositories';
 import { STORAGE_CONFIG } from '../config/storage.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private sqliteRepo = inject(UserSqliteRepository);
   private supabaseRepo = inject(UserSupabaseRepository);
   private currentUser = signal<User | null>(null);
   isAuthenticated = signal<boolean>(false);
@@ -17,11 +16,11 @@ export class AuthService {
       case 'supabase':
         return this.supabaseRepo;
       case 'api':
-        return this.sqliteRepo;
+        return this.supabaseRepo;
       case 'sqlite':
-        return this.sqliteRepo;
+        return this.supabaseRepo;
       default:
-        return this.sqliteRepo;
+        return this.supabaseRepo;
     }
   }
 

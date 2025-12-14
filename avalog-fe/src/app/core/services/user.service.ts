@@ -1,13 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { User } from '../models';
-import { UserSqliteRepository, UserSupabaseRepository } from '../repositories';
+import { UserSupabaseRepository } from '../repositories';
 import { STORAGE_CONFIG } from '../config/storage.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private sqliteRepo = inject(UserSqliteRepository);
   private supabaseRepo = inject(UserSupabaseRepository);
 
   private get userRepo() {
@@ -15,11 +14,11 @@ export class UserService {
       case 'supabase':
         return this.supabaseRepo;
       case 'api':
-        return this.sqliteRepo;
+        return this.supabaseRepo;
       case 'sqlite':
-        return this.sqliteRepo;
+        return this.supabaseRepo;
       default:
-        return this.sqliteRepo;
+        return this.supabaseRepo;
     }
   }
 

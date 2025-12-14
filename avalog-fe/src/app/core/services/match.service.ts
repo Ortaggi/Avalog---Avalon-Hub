@@ -1,13 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { AVALON_ROLES, Match, Role } from '../models';
-import { MatchSqliteRepository, MatchSupabaseRepository } from '../repositories';
+import { MatchSupabaseRepository } from '../repositories';
 import { STORAGE_CONFIG } from '../config/storage.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MatchService {
-  private sqliteRepo = inject(MatchSqliteRepository);
   private supabaseRepo = inject(MatchSupabaseRepository);
 
   private get matchRepo() {
@@ -15,11 +14,11 @@ export class MatchService {
       case 'supabase':
         return this.supabaseRepo;
       case 'api':
-        return this.sqliteRepo;
+        return this.supabaseRepo;
       case 'sqlite':
-        return this.sqliteRepo;
+        return this.supabaseRepo;
       default:
-        return this.sqliteRepo;
+        return this.supabaseRepo;
     }
   }
 
