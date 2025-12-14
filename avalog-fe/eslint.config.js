@@ -6,9 +6,6 @@ const angular = require("angular-eslint");
 
 module.exports = defineConfig([
   {
-    globalIgnores:([
-      "env.d.ts"
-    ]),
     files: ["**/*.ts"],
     extends: [
       eslint.configs.recommended,
@@ -17,6 +14,9 @@ module.exports = defineConfig([
       angular.configs.tsRecommended,
     ],
     processor: angular.processInlineTemplates,
+    ignores: [
+      "src/env.d.ts"
+    ],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@angular-eslint/directive-selector": [
