@@ -1,42 +1,34 @@
-# Avalog - Architettura Frontend v0.1
+# Avalog - Architettura Frontend
 
 ## Tecnologie
 
 - **Angular 19**
 - **Bootstrap 5** (SCSS + JS)
 - **SCSS** per gli stili custom
+- **Supabase** per database e API
 
 ---
 
 ## Struttura Progetto
 ```
 src/app/
-├── core/                   # Servizi singleton, guards, interceptors
-├── shared/                 # Componenti, pipe, direttive riutilizzabili
-│   └── components/
-│       └── navbar/
+├── core/
+│   ├── config/             # Configurazioni (Supabase)
+│   ├── guards/             # Route guards (auth, guest)
+│   ├── models/             # Interfacce TypeScript
+│   ├── repositories/       # Repository pattern
+│   │   └── supabase/       # Implementazione Supabase
+│   └── services/           # Servizi Angular
 ├── features/
 │   ├── auth/               # Login, registrazione
-│   │   └── pages/
-│   │       ├── login/
-│   │       └── register/
-│   ├── dashboard/          # Dashboard statistiche personali
-│   │   └── pages/
-│   │       └── dashboard-home/
-│   ├── matches/            # Registro partite
-│   │   └── pages/
-│   │       ├── matches-list/
-│   │       └── match-create/
+│   ├── dashboard/          # Dashboard statistiche
+│   ├── matches/            # Gestione partite
 │   ├── leaderboard/        # Classifiche
-│   │   └── pages/
-│   │       └── leaderboard-home/
 │   ├── profile/            # Profilo utente
-│   │   └── pages/
-│   │       └── profile-home/
 │   └── groups/             # Gestione gruppi
-│       └── pages/
-│           ├── groups-list/
-│           └── group-detail/
+└── shared/
+    └── components/
+        └── navbar/
 ```
 
 ---
@@ -45,8 +37,8 @@ src/app/
 
 | Modulo | Scopo | Lazy Loaded |
 |--------|-------|-------------|
-| `CoreModule` | Servizi singleton, guards, interceptors | No |
-| `SharedModule` | Componenti riutilizzabili (navbar, ecc.) | No |
+| `CoreModule` | Servizi singleton, guards | No |
+| `SharedModule` | Componenti riutilizzabili | No |
 | `AuthModule` | Login, registrazione | Sì |
 | `DashboardModule` | Dashboard statistiche | Sì |
 | `MatchesModule` | Gestione partite | Sì |
@@ -58,18 +50,79 @@ src/app/
 
 ## Routing
 
-| Path | Modulo | Componente |
-|------|--------|------------|
-| `/` | - | Redirect a `/dashboard` |
-| `/auth/login` | Auth | LoginComponent |
-| `/auth/register` | Auth | RegisterComponent |
-| `/dashboard` | Dashboard | DashboardHomeComponent |
-| `/matches` | Matches | MatchesListComponent |
-| `/matches/create` | Matches | MatchCreateComponent |
-| `/leaderboard` | Leaderboard | LeaderboardHomeComponent |
-| `/profile` | Profile | ProfileHomeComponent |
-| `/groups` | Groups | GroupsListComponent |
-| `/groups/:id` | Groups | GroupDetailComponent |
+| Path | Modulo | Componente | Guard |
+|------|--------|------------|-------|
+| `/` | - | Redirect a `/dashboard` | - |
+| `/auth/login` | Auth | LoginComponent | guestGuard |
+| `/auth/register` | Auth | RegisterComponent | guestGuard |
+| `/dashboard` | Dashboard | DashboardHomeComponent | authGuard |
+| `/matches` | Matches | MatchesListComponent | authGuard |
+| `/matches/create` | Matches | MatchCreateComponent | authGuard |
+| `/leaderboard` | Leaderboard | LeaderboardHomeComponent | authGuard |
+| `/profile` | Profile | ProfileHomeComponent | authGuard |
+| `/groups` | Groups | GroupsListComponent | authGuard |
+| `/groups/:id` | Groups | GroupDetailComponent | authGuard |
+
+---
+
+## Autenticazione
+
+### Flow
+1. Utente inserisce credenziali
+2. `AuthService` valida tramite `UserSupabaseRepository`
+3. Se valido, `TokenService` salva token nei cookie (7 giorni)
+4. `authGuard` protegge le route autenticate
+5. `guestGuard` impedisce accesso a login se già autenticato
+
+### Token
+- Salvati in cookie HTTP
+- Durata: 7 giorni
+- Contiene: `avalog_token` (token casuale) e `avalog_user_id`
+
+---
+
+## Repository Pattern
+```
+┌─────────────────────────────────────────────────┐
+│              Angular Services                    │
+│         (AuthService, MatchService, etc.)        │
+└──────────────────────┬──────────────────────────┘
+                       │
+                       ▼
+┌─────────────────────────────────────────────────┐
+│              Repository Interface                │
+│     (UserRepository, MatchRepository, etc.)      │
+└──────────────────────┬──────────────────────────┘
+                       │
+                       ▼
+┌─────────────────────────────────────────────────┐
+│           Supabase Implementation                │
+│         (UserSupabaseRepository, etc.)           │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+## Database (Supabase)
+
+### Tabelle
+
+| Tabella | Descrizione |
+|---------|-------------|
+| `users` | Utenti registrati |
+| `groups` | Gruppi di gioco |
+| `group_members` | Relazione utenti-gruppi |
+| `matches` | Partite |
+| `match_players` | Giocatori per partita con ruolo |
+
+### Schema
+```sql
+users (id, email, username, display_name, avatar, password, created_at)
+groups (id, name, description, admin_id, invite_code, created_at)
+group_members (group_id, user_id, joined_at)
+matches (id, group_id, date, winning_faction, victory_type, notes, created_by, created_at)
+match_players (match_id, user_id, role_id)
+```
 
 ---
 
@@ -99,12 +152,18 @@ src/app/
 # Avvia dev server
 ng serve
 
-# Genera nuovo componente in un modulo
-ng generate component features/[modulo]/pages/[nome] --module=features/[modulo]
+# Genera nuovo componente
+ng generate component features/[modulo]/pages/[nome]
 
-# Genera servizio nel core
+# Genera servizio
 ng generate service core/services/[nome]
 
 # Build produzione
 ng build --configuration=production
+
+# Lint
+ng lint
+
+# Commit con wizard
+npm run commit
 ```

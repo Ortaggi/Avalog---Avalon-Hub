@@ -1,8 +1,8 @@
 # 🏰 Avalog - Avalon Hub
 
-**Avalog** è una web app pensata per tracciare e analizzare le tue sessioni di *Avalon*.
+**Avalog** è una web app pensata per tracciare e analizzare le tue sessioni di *The Resistance: Avalon*.
 
-Registra ogni partita, segna chi ha giocato quale ruolo, e lascia che i dati rivelino la verità
+Registra ogni partita, segna chi ha giocato quale ruolo, e lascia che i dati rivelino la verità: chi è il Merlino più convincente? Chi viene sempre scoperto come spia? Chi ha il miglior win rate come Mordred?
 
 > Per gruppi che prendono il bluff sul serio.
 
@@ -26,15 +26,21 @@ Registra ogni partita, segna chi ha giocato quale ruolo, e lascia che i dati riv
 - SCSS (tema medievale custom)
 
 ### Backend
-- *Coming soon*
+- Supabase (PostgreSQL + API REST)
+
+### DevOps
+- GitHub Actions (CI/CD)
+- Nginx (reverse proxy)
+- Hostinger (hosting)
 
 ---
 
 ## 🚀 Quick Start
 
 ### Prerequisiti
-- Node.js v18.19+ o v20+
+- Node.js v20+
 - npm
+- Account Supabase
 
 ### Installazione
 ```bash
@@ -49,6 +55,10 @@ npm install
 cd avalog-fe
 npm install
 
+# Configura Supabase
+# Copia src/app/core/config/supabase.config.example.ts in supabase.config.ts
+# e inserisci le tue credenziali
+
 # Avvia il dev server
 ng serve
 ```
@@ -60,12 +70,21 @@ L'app sarà disponibile su `http://localhost:4200`
 ## 📁 Struttura Progetto
 ```
 Avalog---Avalon-Hub/
-├── avalog-fe/          # Frontend Angular
-├── avalog-be/          # Backend (coming soon)
-├── .husky/             # Git hooks
-├── REQUIREMENTS.md     # Requisiti funzionali
-├── ARCHITECTURE.md     # Documentazione tecnica
-├── CONTRIBUTING.md     # Guida alla contribuzione
+├── .github/
+│   └── workflows/
+│       └── deploy.yml      # CI/CD pipeline
+├── avalog-fe/              # Frontend Angular
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── core/       # Servizi, modelli, repository
+│   │   │   ├── features/   # Moduli funzionali
+│   │   │   └── shared/     # Componenti condivisi
+│   │   └── styles/         # SCSS globali
+│   └── package.json
+├── REQUIREMENTS.md         # Requisiti funzionali
+├── ARCHITECTURE.md         # Documentazione tecnica
+├── CONTRIBUTING.md         # Guida alla contribuzione
+├── DEPLOYMENT.md           # Guida al deploy
 └── README.md
 ```
 
@@ -73,26 +92,37 @@ Avalog---Avalon-Hub/
 
 ## 📖 Documentazione
 
-| Documento                             | Descrizione |
-|---------------------------------------|-------------|
-| [REQUIREMENTS.md](../REQUIREMENTS.md) | Requisiti funzionali del progetto |
-| [ARCHITECTURE.md](../ARCHITECTURE.md) | Architettura frontend |
-| [CONTRIBUTING.md](../CONTRIBUTING.md) | Guida per contribuire |
+| Documento | Descrizione |
+|-----------|-------------|
+| [REQUIREMENTS.md](./REQUIREMENTS.md) | Requisiti funzionali del progetto |
+| [ARCHITECTURE.md](./avalog-fe/ARCHITECTURE.md) | Architettura frontend |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | Guida per contribuire |
+| [DEPLOYMENT.md](./DEPLOYMENT.md) | Guida al deploy |
 
 ---
 
 ## 🤝 Contribuire
 
-Leggi la [guida alla contribuzione](../CONTRIBUTING.md) per i dettagli su:
+Leggi la [guida alla contribuzione](./CONTRIBUTING.md) per i dettagli su:
 - Git hooks e linting
 - Standard per i commit
 - Workflow di sviluppo
 
 ---
 
+## 🚀 Deploy
+
+Il progetto usa GitHub Actions per il deploy automatico. Ogni push su `main` triggera:
+1. Build dell'app Angular
+2. Deploy via rsync su server Hostinger
+
+Leggi la [guida al deploy](./DEPLOYMENT.md) per i dettagli.
+
+---
+
 ## 📜 Licenza
 
-*Da definire*
+MIT
 
 ---
 

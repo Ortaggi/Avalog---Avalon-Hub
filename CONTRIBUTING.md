@@ -131,3 +131,19 @@ ng lint
 ```bash
    git push origin feature/nome-feature
 ```
+
+---
+
+## Deploy
+
+Il deploy avviene automaticamente tramite GitHub Actions ad ogni push su `main`.
+
+Per maggiori dettagli, leggi la [guida al deploy](./DEPLOYMENT.md).
+
+### Build locale
+```bash
+cd avalog-fe
+ng build
+```
+
+I file compilati saranno in `dist/avalog-fe/browser/`.
