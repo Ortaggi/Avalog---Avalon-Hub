@@ -24,7 +24,7 @@ jobs:
 
       - name: Build Angular app
         working-directory: ./avalog-fe
-        run: npm run build -- --configuration=production
+        run: npx ng build
 
       - name: Setup SSH
         run: |
