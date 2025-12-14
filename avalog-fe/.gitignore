@@ -45,4 +45,6 @@ Thumbs.db
 
 /src/app/core/config/supabase.config.ts
 /src/app/core/config/supabase.config.example.ts
+.env
+environment.d.ts
 
