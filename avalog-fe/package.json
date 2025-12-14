@@ -9,8 +9,7 @@
     "test": "ng test",
     "prepare": "husky",
     "lint": "ng lint",
-    "commit": "cz",
-    "postinstall": "node copy-wasm.js"
+    "commit": "cz"
   },
   "private": true,
   "dependencies": {
