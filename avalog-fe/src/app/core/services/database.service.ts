@@ -33,10 +33,10 @@ export class DatabaseService {
     if (savedDb) {
       const data = new Uint8Array(JSON.parse(savedDb));
       this.db = new SQL.Database(data);
-      console.log('Database caricato da localStorage');
+      //console.log('Database caricato da localStorage');
     } else {
       this.db = new SQL.Database();
-      console.log('Nuovo database creato');
+      //console.log('Nuovo database creato');
       this.createTables();
     }
 

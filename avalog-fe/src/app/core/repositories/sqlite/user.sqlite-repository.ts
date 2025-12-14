@@ -39,16 +39,16 @@ export class UserSqliteRepository implements BaseRepository<User> {
     const stmt = db.prepare('SELECT * FROM users WHERE email = ?');
     stmt.bind([email]);
 
-    console.log('Checking email:', email);
+    //console.log('Checking email:', email);
 
     if (stmt.step()) {
       const row = stmt.get();
-      console.log('Found user:', row);
+      //console.log('Found user:', row);
       stmt.free();
       return this.mapRowToUser(row);
     }
 
-    console.log('No user found with email:', email);
+    //console.log('No user found with email:', email);
     stmt.free();
     return null;
   }
@@ -58,16 +58,16 @@ export class UserSqliteRepository implements BaseRepository<User> {
     const stmt = db.prepare('SELECT * FROM users WHERE username = ?');
     stmt.bind([username]);
 
-    console.log('Checking username:', username);
+    //console.log('Checking username:', username);
 
     if (stmt.step()) {
       const row = stmt.get();
-      console.log('Found user:', row);
+      //console.log('Found user:', row);
       stmt.free();
       return this.mapRowToUser(row);
     }
 
-    console.log('No user found with username:', username);
+    //console.log('No user found with username:', username);
     stmt.free();
     return null;
   }
