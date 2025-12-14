@@ -42,3 +42,7 @@ testem.log
 .DS_Store
 Thumbs.db
 /package-lock.json
+
+src/app/core/config/supabase.config.ts
+src/app/core/config/supabase.config.example.ts
+
