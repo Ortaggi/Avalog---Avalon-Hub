@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { DatabaseService } from '../../services/database.service';
+import { DatabaseService } from '../../services';
 import { User } from '../../models';
 import { BaseRepository } from '../base.repository';
-import { SqlValue } from 'sql.js';
+import { SqlValue } from './sql.types';
 
 @Injectable({
   providedIn: 'root'

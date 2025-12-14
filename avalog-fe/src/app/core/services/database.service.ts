@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Database } from 'sql.js';
-declare const initSqlJs: any;
+
+type Database = any;
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +23,9 @@ export class DatabaseService {
   }
 
   private async initDatabase(): Promise<Database> {
+    // Import dinamico di sql.js - funziona solo in sviluppo
+    const initSqlJs = (await import('sql.js')).default;
+
     const SQL = await initSqlJs({
       locateFile: () => '/assets/sql-wasm.wasm'
     });
