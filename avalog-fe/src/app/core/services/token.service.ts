@@ -71,15 +71,15 @@ export class TokenService {
     for (const cookie of cookies) {
       const equalsIndex = cookie.trim().indexOf('=');
 
-      console.log('cookie:', cookie);
-      console.log('equalsIndex:', equalsIndex);
+      //console.log('cookie:', cookie);
+      //console.log('equalsIndex:', equalsIndex);
 
       if (equalsIndex > -1) {
         const key = cookie.trim().substring(0, equalsIndex);
         const value = cookie.trim().substring(equalsIndex + 1);
 
-        console.log('cookie key:', key);
-        console.log('cookie value:', value);
+        //console.log('cookie key:', key);
+        //console.log('cookie value:', value);
 
         if (key === name) {
           return value;
