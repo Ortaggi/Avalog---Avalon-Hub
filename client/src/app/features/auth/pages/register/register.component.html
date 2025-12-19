@@ -1,0 +1,101 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="register-header">
+      <h1>Avalog</h1>
+      <p>Registrati sulla piattaforma</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+      @if (errorMessage) {
+        <div class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          name="email"
+          [(ngModel)]="email"
+          required
+          email
+          placeholder="Email"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input
+          type="text"
+          class="form-control"
+          id="username"
+          name="username"
+          [(ngModel)]="username"
+          required
+          minlength="3"
+          placeholder="Username"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="displayName" class="form-label">Nome visualizzato</label>
+        <input
+          type="text"
+          class="form-control"
+          id="displayName"
+          name="displayName"
+          [(ngModel)]="displayName"
+          required
+          placeholder="Nome visualizzato"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="password"
+          name="password"
+          [(ngModel)]="password"
+          required
+          minlength="6"
+          placeholder="Password"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="confirmPassword" class="form-label">Conferma Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="confirmPassword"
+          name="confirmPassword"
+          [(ngModel)]="confirmPassword"
+          required
+          placeholder="Conferma Password"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary w-100"
+        [disabled]="registerForm.invalid || isLoading"
+      >
+        @if (isLoading) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Registrazione in corso...
+        } @else {
+          Registrati
+        }
+      </button>
+    </form>
+
+    <div class="register-footer">
+      <p>Hai già un account? <a routerLink="/auth/login">Accedi</a></p>
+    </div>
+  </div>
+</div>

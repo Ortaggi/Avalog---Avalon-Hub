@@ -1,0 +1,75 @@
+// Importo le variabili custom
+@use 'styles/variables' as vars;
+
+// Override variabili Bootstrap PRIMA di importarlo
+$primary: vars.$primary;
+$secondary: vars.$secondary;
+$success: vars.$success;
+$danger: vars.$danger;
+$warning: vars.$warning;
+$info: vars.$info;
+$body-bg: vars.$bg-dark;
+$body-color: vars.$text-light;
+
+// Importo Bootstrap
+@use 'bootstrap/scss/bootstrap';
+
+// Stili globali custom
+body {
+  min-height: 100vh;
+}
+
+// Navbar custom
+.navbar {
+  background-color: vars.$bg-medium !important;
+  border-bottom: 2px solid vars.$accent-gold;
+}
+
+.navbar-brand {
+  color: vars.$accent-gold !important;
+  font-weight: bold;
+}
+
+body {
+  background-color: vars.$bg-dark !important;
+  color: vars.$text-light !important;
+  min-height: 100vh;
+}
+
+.container,
+.container-fluid {
+  background-color: transparent;
+}
+
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+  --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
+  --bs-table-color: #{vars.$text-light};
+  --bs-table-border-color: #{vars.$bg-light};
+}
+
+.card {
+  --bs-card-bg: #{vars.$bg-medium};
+  --bs-card-border-color: #{vars.$bg-light};
+  --bs-card-color: #{vars.$text-light};
+  --bs-card-cap-bg: #{vars.$bg-dark};
+}
+
+.alert {
+  --bs-alert-bg: transparent;
+  --bs-alert-color: #{vars.$text-light};
+}
+
+.form-control,
+.form-select {
+  background-color: vars.$bg-light;
+  border-color: vars.$bg-light;
+  color: vars.$text-light;
+
+  &:focus {
+    background-color: vars.$bg-light;
+    color: vars.$text-light;
+    border-color: vars.$accent-gold;
+  }
+}
