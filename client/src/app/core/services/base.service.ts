@@ -1,10 +1,8 @@
-import { inject, Injectable } from "@angular/core";
-import { ApiClient } from "../models/api";
-import { SERVER_TYPE_TOKEN } from "../config/client.config";
-import { SupabaseService } from "./supabase.service";
-import { HttpClientService } from "./api.service";
-
-
+import { inject, Injectable } from '@angular/core';
+import { ApiClient } from '../models/api';
+import { SERVER_TYPE_TOKEN } from '../config/client.config';
+import { SupabaseService } from './supabase.service';
+import { HttpClientService } from './api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -50,7 +48,9 @@ export class BaseService {
       return this.client.subscribe(table, callback);
     }
     // Return empty unsubscribe function for API client
-    return () => { /* empty */ };
+    return () => {
+      /* empty */
+    };
   }
 
   getServerType() {

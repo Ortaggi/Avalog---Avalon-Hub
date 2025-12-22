@@ -6,6 +6,7 @@ import { fastifySwagger } from '@fastify/swagger';
 import { fastifySwaggerUi } from '@fastify/swagger-ui';
 import { fastifyStatic } from '@fastify/static';
 import { routes } from './routes/routes.js';
+import type { FastifyPluginAsync } from 'fastify';
 import jwtPlugin from '@fastify/jwt';
 import { swaggerOptions, swaggerUiOptions } from './plugins/swagger.js';
 import { fileURLToPath } from 'node:url';
@@ -22,45 +23,73 @@ if (!JWT_SECRET) {
   process.exit(1);
 }
 
-// Export for fastify-cli
-export default async function (app: any, opts: any) {
+// Main app factory function
+async function createApp() {
+  const app = fastify().withTypeProvider<ZodTypeProvider>();
+
+  // Set compilers
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
 
-  app.register(jwtPlugin, { secret: JWT_SECRET });
-  app.register(fastifyCors, { origin: '*' });
-  app.register(fastifySwagger, swaggerOptions);
-  app.register(fastifySwaggerUi, swaggerUiOptions);
+  // Register plugins
+  await app.register(jwtPlugin as any, { secret: JWT_SECRET });
+  await app.register(fastifyCors, { origin: '*' });
+  await app.register(fastifySwagger, swaggerOptions);
+  await app.register(fastifySwaggerUi, swaggerUiOptions);
 
   // Serve static files from the Angular build directory
-  const clientPath = path.join(__dirname, '../../client/dist');
-
-  // Also serve static assets directly (without prefix)
-  app.register(fastifyStatic, {
+  const clientPath = path.resolve(__dirname, '../../client/dist/avalog-fe/browser');
+  await app.register(fastifyStatic, {
     root: clientPath,
     prefix: '/',
     decorateReply: false,
   });
 
-  app.register(routes);
+  // Register API routes
+  await app.register(routes);
+
+  return app;
 }
 
-// For development, create and start the server directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  console.log('Process argv: ', process.argv);
-  const app = fastify().withTypeProvider<ZodTypeProvider>();
+// Export for fastify-cli (production)
+const plugin: FastifyPluginAsync = async function (fastify, opts) {
+  fastify.setValidatorCompiler(validatorCompiler);
+  fastify.setSerializerCompiler(serializerCompiler);
 
-  async function start() {
+  await fastify.register(jwtPlugin as any, { secret: JWT_SECRET });
+  await fastify.register(fastifyCors, { origin: '*' });
+  await fastify.register(fastifySwagger, swaggerOptions);
+  await fastify.register(fastifySwaggerUi, swaggerUiOptions);
+
+  const clientPath = path.resolve(__dirname, '../../client/dist');
+  await fastify.register(fastifyStatic, {
+    root: clientPath,
+    prefix: '/',
+    decorateReply: false,
+  });
+
+  await fastify.register(routes);
+};
+
+export default plugin;
+
+// Development server (when run directly)
+const isMainModule = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
+
+if (isMainModule) {
+  async function startDevelopmentServer() {
     try {
-      // Register plugins
-      await app.register(await import('./server.js').then((m) => m.default));
+      const app = await createApp();
+
       await app.listen({ port: PORT, host: '0.0.0.0' });
       console.log(`✅ HTTP Server Running on port ${PORT}`);
       console.log(`📄 Swagger UI: http://localhost:${PORT}/docs`);
+      console.log(`🔧 Development Mode`);
     } catch (err) {
-      app.log.error(err);
+      console.error('Failed to start development server:', err);
       process.exit(1);
     }
   }
-  start();
+
+  await startDevelopmentServer();
 }
