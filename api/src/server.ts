@@ -46,7 +46,7 @@ async function createApp() {
   });
 
   // Register API routes
-  await app.register(routes);
+  await app.register(routes, { prefix: '/api' });
 
   return app;
 }
@@ -68,7 +68,7 @@ const plugin: FastifyPluginAsync = async function (fastify, opts) {
     decorateReply: false,
   });
 
-  await fastify.register(routes);
+  await fastify.register(routes, { prefix: '/api' });
 };
 
 export default plugin;
