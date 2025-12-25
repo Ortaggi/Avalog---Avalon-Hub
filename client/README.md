@@ -1,146 +1,59 @@
-# 🏰 Avalog - Avalon Hub
+# Client
 
-**Avalog** è una web app pensata per tracciare e analizzare le tue sessioni di *The Resistance: Avalon*.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.4.
 
-Registra ogni partita, segna chi ha giocato quale ruolo, e lascia che i dati rivelino la verità: chi è il Merlino più convincente? Chi viene sempre scoperto come spia? Chi ha il miglior win rate come Mordred?
+## Development server
 
-> Per gruppi che prendono il bluff sul serio.
+To start a local development server, run:
 
----
-
-## ✨ Funzionalità
-
-- 📝 **Registro partite** — Salva le partite con giocatori, ruoli ed esiti
-- 📊 **Dashboard statistiche** — Win rate, ruoli preferiti, andamento nel tempo
-- 🏆 **Classifiche** — Ranking globali e per ruolo
-- 👤 **Profili giocatore** — Tieni traccia della tua carriera su Avalon
-- 👥 **Gruppi** — Crea e gestisci i tuoi gruppi di gioco
-
----
-
-## 🛠️ Tech Stack
-
-### Frontend
-- Angular 19
-- Bootstrap 5
-- SCSS (tema medievale custom)
-
-### Backend
-- Supabase (PostgreSQL + API REST)
-
-### DevOps
-- GitHub Actions (CI/CD)
-- Nginx (reverse proxy)
-- Hostinger (hosting)
-
----
-
-## 🚀 Quick Start
-
-### Prerequisiti
-- Node.js v20+
-- npm
-- Account Supabase
-
-### Installazione
 ```bash
-# Clona il repository
-git clone https://github.com/[username]/Avalog---Avalon-Hub.git
-cd Avalog---Avalon-Hub
-
-# Installa dipendenze root (Husky, Commitizen)
-npm install
-
-# Installa dipendenze frontend
-cd avalog-fe
-npm install
-
-# Configura Supabase
-# Copia src/app/core/config/supabase.config.example.ts in supabase.config.ts
-# e inserisci le tue credenziali
-
-# Avvia il dev server
 ng serve
 ```
 
-L'app sarà disponibile su `http://localhost:4200`
+Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
----
+## Code scaffolding
 
-## 📁 Struttura Progetto
-```
-Avalog---Avalon-Hub/
-├── .github/
-│   └── workflows/
-│       └── deploy.yml      # CI/CD pipeline
-├── avalog-fe/              # Frontend Angular
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── core/       # Servizi, modelli, repository
-│   │   │   ├── features/   # Moduli funzionali
-│   │   │   └── shared/     # Componenti condivisi
-│   │   └── styles/         # SCSS globali
-│   └── package.json
-├── REQUIREMENTS.md         # Requisiti funzionali
-├── ARCHITECTURE.md         # Documentazione tecnica
-├── CONTRIBUTING.md         # Guida alla contribuzione
-├── DEPLOYMENT.md           # Guida al deploy
-└── README.md
+Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+
+```bash
+ng generate component component-name
 ```
 
----
+For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
 
-## 📖 Documentazione
+```bash
+ng generate --help
+```
 
-| Documento | Descrizione |
-|-----------|-------------|
-| [REQUIREMENTS.md](./REQUIREMENTS.md) | Requisiti funzionali del progetto |
-| [ARCHITECTURE.md](./avalog-fe/ARCHITECTURE.md) | Architettura frontend |
-| [CONTRIBUTING.md](./CONTRIBUTING.md) | Guida per contribuire |
-| [DEPLOYMENT.md](./DEPLOYMENT.md) | Guida al deploy |
+## Building
 
----
+To build the project run:
 
-## 
+```bash
+ng build
+```
 
-## 🤝 Contribuire
+This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
-Leggi la [guida alla contribuzione](./CONTRIBUTING.md) per i dettagli su:
-- Git hooks e linting
-- Standard per i commit
-- Workflow di sviluppo
+## Running unit tests
 
----
+To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
 
-## 🚀 Deploy
+```bash
+ng test
+```
 
-Il progetto usa GitHub Actions per il deploy automatico. Ogni push su `main` triggera:
-1. Build dell'app Angular
-2. Deploy via rsync su server Hostinger
+## Running end-to-end tests
 
-Leggi la [guida al deploy](./DEPLOYMENT.md) per i dettagli.
+For end-to-end (e2e) testing, run:
 
----
+```bash
+ng e2e
+```
 
-## 📜 Licenza
+Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
-MIT
+## Additional Resources
 
----
-
-## 🎲 Ruoli Avalon Supportati
-
-### Fazione Buoni
-- **Merlino** — Conosce i cattivi (tranne Mordred)
-- **Percival** — Conosce Merlino
-- **Fedeli di Artù** — Nessuna informazione speciale
-
-### Fazione Cattivi
-- **Assassino** — Può assassinare Merlino
-- **Morgana** — Appare come Merlino a Percival
-- **Mordred** — Invisibile a Merlino
-- **Oberon** — Non conosce gli altri cattivi
-
----
-
-*Sviluppato con ⚔️ per i fan di Avalon*
+For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
