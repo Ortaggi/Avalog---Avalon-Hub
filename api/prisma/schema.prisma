@@ -1,0 +1,170 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//////////////////////////
+// USERS
+//////////////////////////
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  password   String
+  nickname   String?
+  avatarUrl  String? @map("avatar_url")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  memberships Membership[]
+  games       GameParticipant[]
+  achievements UserAchievement[]
+
+  statistics UserStatistics? 
+
+  @@map("users")
+}
+
+//////////////////////////
+// GROUPS
+//////////////////////////
+model Group {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  memberships Membership[]
+  games       Game[]
+
+  @@map("groups")
+}
+
+model Membership {
+  id      String @id @default(uuid())
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String @map("user_id")
+  group   Group  @relation(fields: [groupId], references: [id])
+  groupId String @map("group_id")
+  role    MembershipRole @default(MEMBER)
+  joinedAt DateTime @default(now()) @map("joined_at")
+
+  @@unique([userId, groupId])
+
+  @@map("memberships")
+}
+
+enum MembershipRole {
+  ADMIN
+  MEMBER
+}
+
+//////////////////////////
+// GAMES / PARTIDAS
+//////////////////////////
+model Game {
+  id        String   @id @default(uuid())
+  group     Group    @relation(fields: [groupId], references: [id])
+  groupId   String @map("group_id")
+  result    GameResult
+  winType   WinType? @map("win_type")
+  notes     String?
+  playedAt  DateTime @default(now()) @map("played_at")
+
+  participants GameParticipant[]
+
+  @@map("games")
+}
+
+model GameParticipant {
+  id       String  @id @default(uuid())
+  game     Game    @relation(fields: [gameId], references: [id])
+  gameId   String @map("game_id")
+  user     User    @relation(fields: [userId], references: [id])
+  userId   String @map("user_id")
+  role     Role
+  faction  Faction
+
+  @@map("game_participants")
+}
+
+enum Role {
+  MERLIN
+  PERCIVAL
+  GOOD_SIMPLE
+  ASSASSIN
+  MORGANA
+  MORDRED
+  OBERON
+  EVIL_SIMPLE
+}
+
+enum Faction {
+  GOOD
+  EVIL
+}
+
+enum GameResult {
+  GOOD_WIN
+  EVIL_WIN
+}
+
+enum WinType {
+  THREE_MISSIONS
+  ASSASSINATION
+}
+
+//////////////////////////
+// STATISTICS / LEADERBOARDS
+//////////////////////////
+model UserStatistics {
+  id             String   @id @default(uuid())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         String   @unique @map("user_id")
+  totalGames     Int      @default(0) @map("total_games")
+  wins           Int      @default(0)
+  goodWins       Int      @default(0) @map("good_wins")
+  evilWins       Int      @default(0) @map("evil_wins")
+  mostPlayedRole Role?
+  bestRole       Role?
+
+  @@map("user_statistics")
+}
+
+//////////////////////////
+// ACHIEVEMENTS / BADGES
+//////////////////////////
+model Achievement {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  users       UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String      @id @default(uuid())
+  user          User        @relation(fields: [userId], references: [id])
+  userId        String @map("user_id")
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  achievementId String @map("achievement_id")
+  unlockedAt    DateTime @default(now()) @map("unlocked_at")
+
+  @@unique([userId, achievementId])
+
+  @@map("user_achievements")
+}

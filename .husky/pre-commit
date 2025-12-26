@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # Frontend
-cd avalog-fe && npx lint-staged
+cd client && npx lint-staged
