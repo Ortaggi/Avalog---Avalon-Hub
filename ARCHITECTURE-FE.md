@@ -35,10 +35,10 @@ src/app/
 
 ## Moduli
 
-| Modulo | Scopo | Lazy Loaded |
-|--------|-------|-------------|
-| `CoreModule` | Servizi singleton, guards | No |
-| `SharedModule` | Componenti riutilizzabili | No |
+| Modulo        | Scopo                     | Lazy Loaded |
+|--------       |-------                    |-------------|
+| `CoreModule`  | Servizi singleton, guards | No |
+| `SharedModule`| Componenti riutilizzabili | No |
 | `AuthModule` | Login, registrazione | Sì |
 | `DashboardModule` | Dashboard statistiche | Sì |
 | `MatchesModule` | Gestione partite | Sì |
