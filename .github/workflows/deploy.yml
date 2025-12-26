@@ -23,6 +23,8 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./client
+        env:
+          NG_APP_ENV: ${{ secrets.NG_APP_ENV }}
         run: npm ci
 
       - name: Build Angular app
