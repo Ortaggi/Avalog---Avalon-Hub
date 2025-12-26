@@ -28,6 +28,8 @@ jobs:
         run: npm ci
 
       - name: Build Angular app
+        env:
+          NG_APP_ENV: ${{ secrets.NG_APP_ENV }}
         working-directory: ./client
         run: ng build
 
