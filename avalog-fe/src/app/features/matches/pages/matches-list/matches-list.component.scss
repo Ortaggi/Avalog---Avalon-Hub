@@ -1,0 +1,217 @@
+@use '../../../../../styles/variables' as vars;
+
+.matches-list {
+  padding-bottom: 2rem;
+}
+
+.page-title {
+  color: vars.$accent-gold;
+  font-size: 2rem;
+  margin: 0;
+}
+
+.btn-primary {
+  background-color: vars.$primary;
+  border-color: vars.$primary;
+
+  &:hover {
+    background-color: darken(vars.$primary, 10%);
+    border-color: darken(vars.$primary, 10%);
+  }
+}
+
+.filters-card {
+  background-color: vars.$bg-medium;
+  border: 1px solid vars.$bg-light;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.form-label {
+  color: vars.$text-light;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.form-select {
+  background-color: vars.$bg-light;
+  border-color: vars.$bg-light;
+  color: vars.$text-light;
+
+  &:focus {
+    background-color: vars.$bg-light;
+    border-color: vars.$accent-gold;
+    color: vars.$text-light;
+    box-shadow: 0 0 0 0.2rem rgba(vars.$accent-gold, 0.25);
+  }
+
+  option {
+    background-color: vars.$bg-medium;
+    color: vars.$text-light;
+  }
+}
+
+.matches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.match-card {
+  background-color: vars.$bg-medium;
+  border-radius: 8px;
+  overflow: hidden;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  &.win {
+    border-left: 4px solid vars.$success;
+  }
+
+  &.loss {
+    border-left: 4px solid vars.$danger;
+  }
+}
+
+.match-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: vars.$bg-dark;
+  border-bottom: 1px solid vars.$bg-light;
+
+  .match-date {
+    color: vars.$accent-gold;
+    font-weight: 600;
+  }
+
+  .match-group {
+    color: vars.$text-muted;
+    font-size: 0.875rem;
+  }
+}
+
+.match-body {
+  padding: 1rem;
+
+  .match-role {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+
+    .role-label {
+      color: vars.$text-muted;
+      font-size: 0.875rem;
+    }
+
+    .role-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 500;
+
+      &.good {
+        background-color: rgba(vars.$good-faction, 0.3);
+        color: lighten(vars.$good-faction, 30%);
+      }
+
+      &.evil {
+        background-color: rgba(vars.$evil-faction, 0.3);
+        color: lighten(vars.$evil-faction, 30%);
+      }
+    }
+  }
+
+  .match-result {
+    margin-bottom: 0.75rem;
+
+    .result-badge {
+      font-size: 1.1rem;
+      font-weight: 600;
+
+      &.win {
+        color: vars.$success;
+      }
+
+      &.loss {
+        color: vars.$danger;
+      }
+    }
+  }
+
+  .match-victory-type {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: vars.$text-muted;
+    font-size: 0.875rem;
+
+    .victory-icon {
+      font-size: 1rem;
+    }
+  }
+}
+
+.match-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: rgba(vars.$bg-dark, 0.5);
+  border-top: 1px solid vars.$bg-light;
+
+  .winner-faction {
+    font-size: 0.8rem;
+
+    &.good {
+      color: lighten(vars.$good-faction, 20%);
+    }
+
+    &.evil {
+      color: lighten(vars.$evil-faction, 20%);
+    }
+  }
+}
+
+.btn-outline-gold {
+  color: vars.$accent-gold;
+  border-color: vars.$accent-gold;
+
+  &:hover {
+    background-color: vars.$accent-gold;
+    color: vars.$bg-dark;
+  }
+}
+
+.empty-results {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: vars.$bg-medium;
+  border-radius: 8px;
+
+  h3 {
+    color: vars.$text-light;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: vars.$text-muted;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.matches-summary {
+  text-align: center;
+}
+
+.spinner-border.text-gold {
+  color: vars.$accent-gold;
+}

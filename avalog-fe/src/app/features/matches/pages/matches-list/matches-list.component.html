@@ -1,0 +1,139 @@
+<div class="matches-list">
+  <div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title">Partite</h1>
+    <a routerLink="/matches/create" class="btn btn-primary"> Nuova Partita </a>
+  </div>
+
+  @if (isLoading) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-gold"></div>
+      <p class="mt-3 text-gold">Caricamento Partite...</p>
+    </div>
+  } @else {
+    <div class="filter-card mb-4">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label for="groupFilter" class="form-label">Gruppo</label>
+          <select
+            id="groupFilter"
+            class="form-select"
+            [(ngModel)]="selectedGroupId"
+            (change)="applyFilter()"
+          >
+            <option value="">Tutti i gruppi</option>
+            @for (group of groups; track group.id) {
+              <option [value]="group.id">{{ group.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label for="esitoFilter" class="form-label">Esito</label>
+          <select
+            id="esitoFilter"
+            class="form-select"
+            [(ngModel)]="selectedEsito"
+            (change)="applyFilter()"
+          >
+            <option value="">Tutti</option>
+            <option value="Tutti">Tutti</option>
+            <option value="win">Vittorie</option>
+            <option value="loss">Sconfitte</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label for="orderFilter" class="form-label">Ordinamento</label>
+          <select
+            id="orderFilter"
+            class="form-select"
+            [(ngModel)]="sortOrder"
+            (change)="applyFilter()"
+          >
+            <option value="desc">Più recenti</option>
+            <option value="asc">Più vecchie</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <button class="btn btn-outline-secondary w-100" (click)="resetFilters()">
+            Reset filtri
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista partite -->
+    @if (filteredMatches.length > 0) {
+      <div class="matches-grid">
+        @for (match of filteredMatches; track match.id) {
+          <div class="match-card" [class.win]="didUserWin(match)" [class.loss]="!didUserWin(match)">
+            <div class="match-header">
+              <span class="match-date">{{ match.date | date: 'dd/MM/yyyy' }}</span>
+              <span class="match-group">{{ getGroupName(match.groupId) }}</span>
+            </div>
+
+            <div class="match-body">
+              <div class="match-role">
+                <span class="role-label">Ruolo:</span>
+                <span
+                  class="role-badge"
+                  [class.good]="getRoleFaction(getUserRoleInMatch(match)) === 'good'"
+                  [class.evil]="getRoleFaction(getUserRoleInMatch(match)) === 'evil'"
+                >
+                  {{ getRoleName(getUserRoleInMatch(match)) }}
+                </span>
+              </div>
+
+              <div class="match-result">
+                <span
+                  class="result-badge"
+                  [class.win]="didUserWin(match)"
+                  [class.loss]="!didUserWin(match)"
+                >
+                  {{ didUserWin(match) ? 'Vittoria' : 'Sconfitta' }}
+                </span>
+              </div>
+
+              <div class="match-victory-type">
+                <span class="victory-icon">{{ getVictoryTypeIcon(match.victoryType) }}</span>
+                <span class="victory-label">{{ getVictoryTypeLabel(match.victoryType) }}</span>
+              </div>
+            </div>
+
+            <div class="match-footer">
+              <span
+                class="winner-faction"
+                [class.good]="match.winningFaction === 'good'"
+                [class.evil]="match.winningFaction === 'evil'"
+              >
+                Vincitori:
+                {{ match.winningFaction === 'good' ? 'Leali di Artù' : 'Servitori di Mordred' }}
+              </span>
+              <a [routerLink]="['/matches', match.id]" class="btn btn-sm btn-outline-gold">
+                Dettagli
+              </a>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="matches-summary mt-4">
+        <p class="text-muted">{{ filteredMatches.length }} partite trovate</p>
+      </div>
+    } @else {
+      <div class="empty-results">
+        <h3>Nessuna partita trovata</h3>
+        @if (matches.length === 0) {
+          <p>Non hai ancora registrato nessuna partita.</p>
+          <a routerLink="/matches/create" class="btn btn-primary">
+            Registra la tua prima partita
+          </a>
+        } @else {
+          <p>Prova a modificare i filtri.</p>
+          <button class="btn btn-outline-secondary" (click)="resetFilters()">Reset filtri</button>
+        }
+      </div>
+    }
+  }
+</div>
