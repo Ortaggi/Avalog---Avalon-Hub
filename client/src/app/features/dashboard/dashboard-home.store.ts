@@ -1,5 +1,12 @@
-import { inject } from '@angular/core';
-import { patchState, signalStore, withHooks, withMethods, withState } from '@ngrx/signals';
+import { computed, inject } from '@angular/core';
+import {
+  patchState,
+  signalStore,
+  withComputed,
+  withHooks,
+  withMethods,
+  withState,
+} from '@ngrx/signals';
 import { StatisticsService } from '../../shared/services/statistics.service';
 import { currentUserStore } from '../../shared/current-user.store';
 import { GameService } from '../../shared/services/games.service';
@@ -21,6 +28,18 @@ export const initialDashboardHomeState: DashboardHomeState = {
 
 export const dashboardHomeStore = signalStore(
   withState(initialDashboardHomeState),
+  withComputed(({ statistics }) => ({
+    lostGames: computed(() => {
+      const total = statistics()?.totalGames ?? 0;
+      const wins = statistics()?.wins ?? 0;
+      return total - wins;
+    }),
+    winRate: computed(() => {
+      const total = statistics()?.totalGames ?? 0;
+      const wins = statistics()?.wins ?? 0;
+      return total > 0 ? (wins / total) * 100 : 0;
+    }),
+  })),
   withMethods(
     (
       store,
@@ -29,10 +48,15 @@ export const dashboardHomeStore = signalStore(
       gameService = inject(GameService),
     ) => ({
       async loadData() {
+        const userId = loggedService.id();
+        if (!userId) {
+          return;
+        }
+
         patchState(store, { isLoading: true });
         try {
           const [statistics, matches] = await Promise.all([
-            statService.getStatistics(loggedService.id()!),
+            statService.getStatistics(userId),
             gameService.getGames(),
           ]);
           console.log('Statistics: ', statistics, ' game: ', matches);

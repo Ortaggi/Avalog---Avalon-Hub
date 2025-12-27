@@ -12,7 +12,7 @@
       <div class="col-12 col-sm-6 col-md-3 mb-3">
         <div class="stat-card card bg-medium-grey border border-light-grey">
           <div class="card-body">
-            <div class="h2 text-gold font-weight-bold">{{ store.statistics().totalGames }}</div>
+            <div class="h2 text-gold font-weight-bold">{{ store.statistics()?.totalGames }}</div>
             <div class="h6 text-light-muted">Partite Giocate</div>
           </div>
         </div>
@@ -20,7 +20,7 @@
       <div class="col-12 col-sm-6 col-md-3 mb-3">
         <div class="stat-card card bg-medium-grey border border-light-grey">
           <div class="card-body">
-            <div class="h2 text-gold font-weight-bold">{{ store.statistics().wins }}</div>
+            <div class="h2 text-gold font-weight-bold">{{ store.statistics()?.wins }}</div>
             <div class="h6 text-light-muted">Vittorie</div>
           </div>
         </div>
@@ -28,7 +28,7 @@
       <div class="col-12 col-sm-6 col-md-3 mb-3">
         <div class="stat-card card bg-medium-grey border border-light-grey">
           <div class="card-body">
-            <div class="h2 text-gold font-weight-bold">{{ store.statistics().totalLosses }}</div>
+            <div class="h2 text-gold font-weight-bold">{{ store.lostGames() }}</div>
             <div class="h6 text-light-muted">Sconfitte</div>
           </div>
         </div>
@@ -36,7 +36,7 @@
       <div class="col-12 col-sm-6 col-md-3 mb-3">
         <div class="stat-card card bg-medium-grey border border-light-grey">
           <div class="card-body">
-            <div class="h2 text-gold font-weight-bold">{{ store.statistics().totalDraws }}</div>
+            <div class="h2 text-gold font-weight-bold">0</div>
             <div class="h6 text-light-muted">Pareggi</div>
           </div>
         </div>
@@ -50,15 +50,15 @@
             <div class="faction-stats">
               <div class="faction-stat">
                 <span class="label">Partite</span>
-                <span class="value">{{ store.statistics().winsByFaction.good.played }}</span>
+                <span class="value">0</span>
               </div>
               <div class="faction-stat">
                 <span class="label">Vittorie</span>
-                <span class="value">{{ store.statistics().winsByFaction.good.wins }}</span>
+                <span class="value">0</span>
               </div>
               <div class="faction-stat">
                 <span class="label">Win Rate</span>
-                <span class="value">{{ store.statistics().winsByFaction.good.winRate }}%</span>
+                <span class="value">0%</span>
               </div>
             </div>
           </div>
@@ -71,15 +71,15 @@
             <div class="faction-stats">
               <div class="faction-stat">
                 <span class="label">Partite</span>
-                <span class="value">{{ store.statistics().winsByFaction.evil.played }}</span>
+                <span class="value">0</span>
               </div>
               <div class="faction-stat">
                 <span class="label">Vittorie</span>
-                <span class="value">{{ store.statistics().winsByFaction.evil.wins }}</span>
+                <span class="value">0</span>
               </div>
               <div class="faction-stat">
                 <span class="label">Win Rate</span>
-                <span class="value">{{ store.statistics().winsByFaction.evil.winRate }}%</span>
+                <span class="value">0%</span>
               </div>
             </div>
           </div>
