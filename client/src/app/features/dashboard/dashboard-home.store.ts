@@ -3,11 +3,12 @@ import { patchState, signalStore, withHooks, withMethods, withState } from '@ngr
 import { StatisticsService } from '../../shared/services/statistics.service';
 import { currentUserStore } from '../../shared/current-user.store';
 import { GameService } from '../../shared/services/games.service';
+import { Statistics } from '../../shared/models/statistics';
 
 interface DashboardHomeState {
   isLoading: boolean;
   error: string | null;
-  statistics: any;
+  statistics: Statistics | null;
   matches: any[];
 }
 
@@ -34,6 +35,7 @@ export const dashboardHomeStore = signalStore(
             statService.getStatistics(loggedService.id()!),
             gameService.getGames(),
           ]);
+          console.log('Statistics: ', statistics, ' game: ', matches);
           patchState(store, { statistics, matches });
         } catch (error) {
           console.error('Error loading dashboard data:', error);
