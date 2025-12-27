@@ -19,15 +19,15 @@ export class BackendApi implements ApiInterface {
 
   async signIn(email: string, password: string): Promise<any> {
     const body = { email, password };
-    return firstValueFrom(this.http.post(`${this.baseUrl}/auth/signin`, body));
+    return firstValueFrom(this.http.post(`${this.baseUrl}/auth/login`, body));
   }
 
   async signOut(): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}/auth/signout`, {}));
+    return firstValueFrom(this.http.post(`${this.baseUrl}/auth/logout`, {}));
   }
 
   async getCurrentUser(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}/auth/user`));
+    return firstValueFrom(this.http.get(`${this.baseUrl}/auth/me`));
   }
 
   async create<T>(table: string, data: T): Promise<T> {

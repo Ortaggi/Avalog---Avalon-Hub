@@ -4,22 +4,26 @@ import { prisma } from '../lib/prisma.js';
 import { LoginInput, RegisterInput } from '../types/aurh.js';
 
 export async function registerUser(data: RegisterInput) {
-  const hashedPassword = await bcrypt.hash(data.password, 10);
-
-  return prisma.user.create({
-    data: {
-      email: data.email,
-      password: hashedPassword,
-      nickname: data.nickname,
-      statistics: {
-        create: {}, // cria stats automáticas
+  try {
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    return prisma.user.create({
+      data: {
+        email: data.email,
+        password: hashedPassword,
+        nickname: data.nickname,
+        statistics: {
+          create: {}, // cria stats automáticas
+        },
       },
-    },
-    select: {
-      id: true,
-      email: true,
-    },
-  });
+      select: {
+        id: true,
+        email: true,
+      },
+    });
+  } catch (error) {
+    console.log('Error hashing password:', error);
+    throw new Error('Error registering user');
+  }
 }
 
 export async function loginUser(data: LoginInput, app: FastifyInstance) {
@@ -36,10 +40,7 @@ export async function loginUser(data: LoginInput, app: FastifyInstance) {
     throw new Error('Invalid credentials');
   }
 
-  const token = app.jwt.sign(
-    { id: user.id, email: user.email },
-    { expiresIn: '7d' },
-  );
+  const token = app.jwt.sign({ id: user.id, email: user.email }, { expiresIn: '7d' });
 
   return token;
 }

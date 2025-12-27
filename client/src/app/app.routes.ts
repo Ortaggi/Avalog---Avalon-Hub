@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth.guard';
 import { AuthLayoutComponent } from './features/auth/layout.component';
+import { LoggedLayoutComponent } from './features/logged-layout.component';
 
 export const routes: Routes = [
   {
@@ -25,10 +26,18 @@ export const routes: Routes = [
     component: AuthLayoutComponent,
   },
   {
-    path: 'dashboard',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./features/dashboard/dashboard-home.component').then((m) => m.DashboardHomeComponent),
+    path: '',
+    component: LoggedLayoutComponent,
+    children: [
+      {
+        path: 'dashboard',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/dashboard/dashboard-home.component').then(
+            (m) => m.DashboardHomeComponent,
+          ),
+      },
+    ],
   },
   {
     path: '**',
