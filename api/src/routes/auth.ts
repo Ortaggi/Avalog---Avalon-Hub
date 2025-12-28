@@ -1,4 +1,4 @@
-import { loginUser, registerUser } from '../controllers/authContoller.js';
+import { loginUser, registerUser } from '../controllers/authController.js';
 import { getUserById } from '../controllers/usersController.js';
 import { LoginRequestUserType, RegisterRequestUserType } from '../dtos/user.js';
 import { authenticate } from '../plugins/authenticate.js';

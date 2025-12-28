@@ -1,7 +1,7 @@
+import { GameFiltersType, GameRequestType, GameUpdateRequestType } from '../dtos/game.js';
 import { prisma } from '../lib/prisma.js';
-import { CreateGameInput } from '../types/games.js';
 
-export async function getGames() {
+export async function getGames(filters: GameFiltersType) {
   const games = await prisma.game.findMany({
     select: {
       id: true,
@@ -11,6 +11,7 @@ export async function getGames() {
       notes: true,
       playedAt: true,
     },
+    where: filters,
   });
 
   return games.map((game) => ({
@@ -19,7 +20,7 @@ export async function getGames() {
   }));
 }
 
-export async function createGame(data: CreateGameInput) {
+export async function createGame(data: GameRequestType) {
   return prisma.game.create({
     data: {
       groupId: data.groupId,
@@ -52,7 +53,7 @@ export async function getGameById(gameId: string) {
 
 export async function updateGame(
   gameId: string,
-  data: Partial<CreateGameInput>,
+  data: GameUpdateRequestType,
 ) {
   const { participants, ...gameData } = data;
 

@@ -16,7 +16,12 @@ export async function gamesRoutes(app: FastifyTypedInstance) {
       preHandler: [authenticate],
       schema: schemaGames.getAll,
     },
-    async () => getGames(),
+    async (request) => {
+      // Looking for queryParams
+      const filters = request.query;
+      const games = await getGames(filters)
+      return games
+    }
   );
 
   app.post(
