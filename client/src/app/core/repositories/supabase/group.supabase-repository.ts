@@ -23,20 +23,26 @@ export class GroupSupabaseRepository implements BaseRepository<Group> {
   }
 
   async getById(id: string): Promise<Group | null> {
-    const { data, error } = await this.client.select('groups', {select: '*', filter: {id}});
+    const { data, error } = await this.client.select('groups', { select: '*', filter: { id } });
     if (error) throw error;
     return data ? this.mapToGroup(data) : null;
   }
 
   async getByUserId(userId: string): Promise<Group[]> {
-    const { data: memberData, error: memberError } = await this.client.select('group_members', {select: 'group_id', filter: {user_id: userId}});
+    const { data: memberData, error: memberError } = await this.client.select('group_members', {
+      select: 'group_id',
+      filter: { user_id: userId }
+    });
 
     if (memberError) throw memberError;
     if (!memberData || memberData.length === 0) return [];
 
     const groupIds = memberData.map((m: any) => m.group_id);
 
-    const { data, error } = await this.client.select('groups', {select: '*', filter: {id: groupIds}});
+    const { data, error } = await this.client.select('groups', {
+      select: '*',
+      filter: { id: groupIds }
+    });
 
     if (error) throw error;
 
@@ -49,7 +55,10 @@ export class GroupSupabaseRepository implements BaseRepository<Group> {
   }
 
   async getByInviteCode(code: string): Promise<Group | null> {
-    const { data, error } = await this.client.select('groups', {select: '*', filter: {invite_code: code}});
+    const { data, error } = await this.client.select('groups', {
+      select: '*',
+      filter: { invite_code: code }
+    });
 
     if (error) throw error;
     return data ? this.mapToGroup(data) : null;
@@ -62,8 +71,8 @@ export class GroupSupabaseRepository implements BaseRepository<Group> {
       name: groupData.name,
       description: groupData.description || null,
       admin_id: groupData.adminId,
-        invite_code: inviteCode
-      });
+      invite_code: inviteCode
+    });
 
     if (error) throw error;
 
@@ -119,16 +128,21 @@ export class GroupSupabaseRepository implements BaseRepository<Group> {
   }
 
   private async mapToGroup(data: Record<string, unknown>): Promise<Group> {
-    const { data: members } = await this.client.select('group_members', {select: 'user_id', filter: {group_id: data['id']}});
+    const group = Array.isArray(data) ? data[0] : data;
+
+    const { data: members } = await this.client.select('group_members', {
+      select: 'user_id',
+      filter: { group_id: group['id'] }
+    });
 
     return {
-      id: data['id'] as string,
-      name: data['name'] as string,
-      description: data['description'] as string | undefined,
-      adminId: data['admin_id'] as string,
-      inviteCode: data['invite_code'] as string | undefined,
+      id: group['id'] as string,
+      name: group['name'] as string,
+      description: group['description'] as string | undefined,
+      adminId: group['admin_id'] as string,
+      inviteCode: group['invite_code'] as string | undefined,
       memberIds: (members || []).map((m: any) => m.user_id),
-      createdAt: new Date(data['created_at'] as string)
+      createdAt: new Date(group['created_at'] as string)
     };
   }
 

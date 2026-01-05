@@ -35,21 +35,18 @@ export class MatchesListComponent implements OnInit {
   private async loadData() {
     this.isLoading = true;
 
-    // TODO: Timeout da togliere, messo solo per il testing
-    setTimeout(async () => {
-      try {
-        const user = this.authService.getCurrentUser();
-        if (user) {
-          this.matches = await this.matchService.getByUserId(user.id);
-          this.groups = await this.groupService.getByUserId(user.id);
-          this.applyFilter();
-        }
-      } catch (error) {
-        console.error('Errore nel caricamento delle partite: ', error);
-      } finally {
-        this.isLoading = false;
+    try {
+      const user = this.authService.getCurrentUser();
+      if (user) {
+        this.matches = await this.matchService.getByUserId(user.id);
+        this.groups = await this.groupService.getByUserId(user.id);
+        this.applyFilter();
       }
-    }, 3000);
+    } catch (error) {
+      console.error('Errore nel caricamento delle partite: ', error);
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   applyFilter(): void {
