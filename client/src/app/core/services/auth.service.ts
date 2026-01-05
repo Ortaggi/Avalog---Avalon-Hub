@@ -36,8 +36,10 @@ export class AuthService {
     try {
       //console.log('Login tentativo per:', email);
       const user = await this.userRepo.validatePassword(email, password);
+      console.log('AuthService.login - user trovato:', user);
       if (user) {
         //console.log('Login successo, utente:', user);
+        console.log('AuthService.login - user.id:', user.id);
         this.currentUser.set(user);
         this.isAuthenticated.set(true);
         //sessionStorage.setItem('currentUserId', user.id);

@@ -10,26 +10,31 @@ export class UserSupabaseRepository implements BaseRepository<User> {
   private client = inject(BaseService);
 
   private mapToUser(data: Record<string, unknown>): User {
+    const user = Array.isArray(data) ? data[0] : data;
+
+    console.log('mapToUser - input data:', data);
+    console.log('mapToUser - typeof data:', typeof data);
+    console.log('mapToUser - data.id:', data['id']);
+    console.log('mapToUser - data["id"]:', data['id']);
+
     return {
-      id: data['id'] as string,
-      email: data['email'] as string,
-      username: data['username'] as string,
-      displayName: data['display_name'] as string,
-      avatar: data['avatar'] as string | undefined,
-      createdAt: new Date(data['created_at'] as string)
+      id: user['id'] as string,
+      email: user['email'] as string,
+      username: user['username'] as string,
+      displayName: user['display_name'] as string,
+      avatar: user['avatar'] as string | undefined,
+      createdAt: new Date(user['created_at'] as string)
     };
   }
 
   async create(entity: Omit<User, 'id' | 'createdAt'> & { password: string }): Promise<User> {
-    const { data, error } = await this.client
-      .insert('users', {
-        email: entity.email,
-        username: entity.username,
-        display_name: entity.displayName,
-        password: entity.password,
-        avatar: entity.avatar || null
-      })
-
+    const { data, error } = await this.client.insert('users', {
+      email: entity.email,
+      username: entity.username,
+      display_name: entity.displayName,
+      password: entity.password,
+      avatar: entity.avatar || null
+    });
 
     if (error) throw error;
     return this.mapToUser(data);
@@ -50,7 +55,7 @@ export class UserSupabaseRepository implements BaseRepository<User> {
   }
 
   async getById(id: string): Promise<User | null> {
-    const { data, error } = await this.client.select('users', {select: '*', filter: {id}});
+    const { data, error } = await this.client.select('users', { select: '*', filter: { id } });
 
     if (error) throw error;
     return data ? this.mapToUser(data) : null;
@@ -72,21 +77,30 @@ export class UserSupabaseRepository implements BaseRepository<User> {
   }
 
   async validatePassword(email: string, password: string): Promise<User | null> {
-    const { data, error } = await this.client.select('users', {select: '*', filter: {email, password}});
+    const { data, error } = await this.client.select('users', {
+      select: '*',
+      filter: { email, password }
+    });
+
+    console.log('Supabase validatePassword - raw data:', data);
+    console.log('Supabase validatePassword - error:', error);
 
     if (error) throw error;
     return data ? this.mapToUser(data) : null;
   }
 
   async getByEmail(email: string): Promise<User | null> {
-    const { data, error } = await this.client.select('users', {select: '*', filter: {email}});
+    const { data, error } = await this.client.select('users', { select: '*', filter: { email } });
 
     if (error && error.code !== 'PGRST116') throw error;
     return data ? this.mapToUser(data) : null;
   }
 
   async getByUsername(username: string): Promise<User | null> {
-    const { data, error } = await this.client.select('users', {select: '*', filter: {username}});
+    const { data, error } = await this.client.select('users', {
+      select: '*',
+      filter: { username }
+    });
 
     if (error && error.code !== 'PGRST116') throw error;
     return data ? this.mapToUser(data) : null;

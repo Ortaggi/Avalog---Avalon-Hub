@@ -34,7 +34,7 @@ export class SupabaseService implements ApiClient {
   }
 
   async insert(table: string, data: any) {
-    return this.supabase.from(table).insert(data);
+    return this.supabase.from(table).insert(data).select().single();
   }
 
   async update(table: string, id: string, data: any) {

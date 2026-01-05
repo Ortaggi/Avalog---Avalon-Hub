@@ -9,6 +9,7 @@ export class TokenService {
   private readonly EXPIRY_DAYS = 7;
 
   setToken(userId: string): string {
+    console.log('TokenService.setToken chiamato con userId:', userId);
     const token = this.generateToken();
     const expiry = new Date();
     expiry.setDate(expiry.getDate() + this.EXPIRY_DAYS);
