@@ -13,7 +13,7 @@ export async function authRoutes(app: FastifyTypedInstance) {
     },
     async (request, reply) => {
       const user = await registerUser(request.body);
-      return reply.status(201).send({ id: user.id, email: user.email });
+      return reply.status(201).send(user);
     }
   );
 

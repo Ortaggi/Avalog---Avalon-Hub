@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
 import { FastifyInstance } from 'fastify';
 import { prisma } from '../lib/prisma.js';
-import { LoginInput, RegisterInput } from '../types/aurh.js';
+import { LoginRequestUserType, RegisterRequestUserType } from '../dtos/user.js';
 
-export async function registerUser(data: RegisterInput) {
+export async function registerUser(data: RegisterRequestUserType) {
   try {
     const hashedPassword = await bcrypt.hash(data.password, 10);
     return prisma.user.create({
@@ -18,6 +18,8 @@ export async function registerUser(data: RegisterInput) {
       select: {
         id: true,
         email: true,
+        nickname: true,
+        avatarUrl: true,
       },
     });
   } catch (error) {
@@ -26,7 +28,7 @@ export async function registerUser(data: RegisterInput) {
   }
 }
 
-export async function loginUser(data: LoginInput, app: FastifyInstance) {
+export async function loginUser(data: LoginRequestUserType, app: FastifyInstance) {
   const user = await prisma.user.findUnique({
     where: { email: data.email },
   });

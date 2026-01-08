@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth.guard';
+import { guestGuard } from './core/guest.guard';
 import { AuthLayoutComponent } from './features/auth/layout.component';
 import { LoggedLayoutComponent } from './features/logged-layout.component';
 
@@ -11,6 +12,7 @@ export const routes: Routes = [
   },
   {
     path: 'auth',
+    canActivateChild: [guestGuard],
     children: [
       {
         path: 'login',
@@ -27,14 +29,35 @@ export const routes: Routes = [
   },
   {
     path: '',
+    canActivateChild: [authGuard],
     component: LoggedLayoutComponent,
     children: [
       {
         path: 'dashboard',
-        canActivate: [authGuard],
         loadComponent: () =>
           import('./features/dashboard/dashboard-home.component').then(
             (m) => m.DashboardHomeComponent,
+          ),
+      },
+      {
+        path: 'games',
+        loadComponent: () =>
+          import('./features/matches/pages/matches-list/matches-list.component').then(
+            (m) => m.MatchesListComponent,
+          ),
+      },
+      {
+        path: 'games/create',
+        loadComponent: () =>
+          import('./features/matches/pages/match-create/match-create.component').then(
+            (m) => m.MatchCreateComponent,
+          ),
+      },
+      {
+        path: 'games/:id',
+        loadComponent: () =>
+          import('./features/matches/pages/match-create/match-create.component').then(
+            (m) => m.MatchCreateComponent,
           ),
       },
     ],

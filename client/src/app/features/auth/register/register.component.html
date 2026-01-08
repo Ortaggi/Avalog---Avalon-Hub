@@ -1,97 +1,113 @@
-<div class="row h-100 align-items-center">
-  <div class="col-12 col-md-6 offset-md-3">
+<div class="row h-100 align-items-center flex-wrap-reverse">
+  <div class="col-12 col-md-4 offset-md-1">
     <div class="card bg-medium-grey border border-gold">
       <div class="card-header text-center border-0">
         <h2 class="text-gold">Avalog</h2>
         <p class="text-light-muted">Registrati sulla piattaforma</p>
       </div>
       <div class="card-body">
-        <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
-          @if (errorMessage) {
-            <div class="alert alert-danger">
-              {{ errorMessage }}
-            </div>
-          }
-
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
           <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input
               type="email"
+              [class.is-invalid]="registerForm.get('email')?.invalid"
               class="form-control"
               id="email"
-              name="email"
-              [(ngModel)]="email"
+              formControlName="email"
               required
-              email
               placeholder="Email"
             />
+            @if (
+              registerForm.get('email')?.invalid &&
+              (registerForm.get('email')?.touched || registerForm.get('email')?.dirty)
+            ) {
+              <div class="invalid-feedback">
+                @if (registerForm.get('email')?.hasError('required')) {
+                  Inserisci un'email
+                } @else if (registerForm.get('email')?.hasError('email')) {
+                  Inserisci un'email valida
+                }
+              </div>
+            }
           </div>
-
           <div class="mb-3">
             <label for="username" class="form-label">Username</label>
             <input
               type="text"
+              [class.is-invalid]="registerForm.get('nickname')?.invalid"
               class="form-control"
               id="username"
-              name="username"
-              [(ngModel)]="username"
+              formControlName="nickname"
               required
               minlength="3"
               placeholder="Username"
             />
+            @if (
+              registerForm.get('nickname')?.invalid &&
+              (registerForm.get('nickname')?.touched || registerForm.get('nickname')?.dirty)
+            ) {
+              <div class="invalid-feedback">
+                @if (registerForm.get('nickname')?.hasError('required')) {
+                  Inserisci un nickname
+                } @else if (registerForm.get('nickname')?.hasError('minlength')) {
+                  Inserisci un nickname di almeno 3 caratteri
+                }
+              </div>
+            }
           </div>
-
-          <div class="mb-3">
-            <label for="displayName" class="form-label">Nome visualizzato</label>
-            <input
-              type="text"
-              class="form-control"
-              id="displayName"
-              name="displayName"
-              [(ngModel)]="displayName"
-              required
-              placeholder="Nome visualizzato"
-            />
-          </div>
-
           <div class="mb-3">
             <label for="password" class="form-label">Password</label>
             <input
               type="password"
+              [class.is-invalid]="registerForm.get('password')?.invalid"
               class="form-control"
               id="password"
-              name="password"
-              [(ngModel)]="password"
+              formControlName="password"
               required
               minlength="6"
               placeholder="Password"
             />
+            @if (
+              registerForm.get('password')?.invalid &&
+              (registerForm.get('password')?.touched || registerForm.get('password')?.dirty)
+            ) {
+              <div class="invalid-feedback">
+                @if (registerForm.get('password')?.hasError('required')) {
+                  Inserisci una password
+                } @else if (registerForm.get('password')?.hasError('minlength')) {
+                  Inserisci una password di almeno 6 caratteri
+                }
+              </div>
+            }
           </div>
-
           <div class="mb-3">
             <label for="confirmPassword" class="form-label">Conferma Password</label>
             <input
               type="password"
+              [class.is-invalid]="registerForm.get('confirmPassword')?.invalid"
               class="form-control"
               id="confirmPassword"
-              name="confirmPassword"
-              [(ngModel)]="confirmPassword"
+              formControlName="confirmPassword"
               required
               placeholder="Conferma Password"
             />
-          </div>
-
-          <button
-            type="submit"
-            class="btn btn-primary w-100"
-            [disabled]="registerForm.invalid || isLoading"
-          >
-            @if (isLoading) {
-              <span class="spinner-border spinner-border-sm me-2"></span>
-              Registrazione in corso...
-            } @else {
-              Registrati
+            @if (
+              registerForm.get('confirmPassword')?.invalid &&
+              (registerForm.get('confirmPassword')?.touched ||
+                registerForm.get('confirmPassword')?.dirty)
+            ) {
+              <div class="invalid-feedback">
+                @if (registerForm.get('confirmPassword')?.hasError('required')) {
+                  Inserisci una conferma password
+                } @else if (registerForm.get('confirmPassword')?.hasError('passwordMismatch')) {
+                  Le password non coincidono
+                }
+              </div>
             }
+          </div>
+          <button type="submit" class="btn btn-primary w-100" [disabled]="registerForm.invalid">
+            Registrati
           </button>
         </form>
       </div>
@@ -102,5 +118,8 @@
         </div>
       </div>
     </div>
+  </div>
+  <div class="col-12 col-md-6">
+    <img alt="Avalon Logo" class="img-fluid" src="logo_avalog_nobg.png" />
   </div>
 </div>

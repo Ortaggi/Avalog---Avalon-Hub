@@ -10,6 +10,21 @@ export const GameResponse = z.object({
     playedAt: z.string(),
 })
 
+export const GameDetailResponse = GameResponse.extend({
+    group: z.object({
+        id: z.uuid(),
+        name: z.string(),
+    }),
+    participants: z.array(
+        z.object({
+            userId: z.uuid(),
+            role: Role,
+            faction: z.enum(['GOOD', 'EVIL']),
+            nickname: z.string().nullish(),
+        }),
+    ),
+})
+
 export const GameArrayResponse = z.array(GameResponse)
 
 export const GameRequest = z.object({
@@ -35,10 +50,13 @@ export const GameFilters = z.object({
     playedAt: z.string().optional(),
     winType: z.enum(['THREE_MISSIONS', 'ASSASSINATION']).optional(),
     result: z.enum(['GOOD_WIN', 'EVIL_WIN']).optional(),
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
 }).partial().optional()
 
 export type GameFiltersType = z.infer<typeof GameFilters>
 export type GameResponseType = z.infer<typeof GameResponse>
+export type GameDetailResponseType = z.infer<typeof GameDetailResponse>
 export type GameRequestType = z.infer<typeof GameRequest>
 export type GameArrayType = z.infer<typeof GameArrayResponse>
 export type GameUpdateRequestType = z.infer<typeof GameUpdateRequest>

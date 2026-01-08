@@ -1,4 +1,4 @@
-export type Faction = 'good' | 'evil';
+export type Faction = 'GOOD' | 'EVIL';
 
 export interface Role {
   id: string;
@@ -11,37 +11,60 @@ export interface Role {
 // TODO: Da spostare nel DB in futuro :/ , preparo intanto questo mock.
 export const AVALON_ROLES: Role[] = [
   {
-    id: 'merlin',
+    id: 'MERLIN',
     name: 'Merlino',
-    faction: 'good',
+    faction: 'GOOD',
     description: 'Conosce i cattivi (tranne Mordred)',
+    icon: 'mage',
   },
   {
-    id: 'percival',
+    id: 'PERCIVAL',
     name: 'Percival',
-    faction: 'good',
+    faction: 'GOOD',
     description: 'Conosce Merlino (ma vede anche Morgana)',
+    icon: 'eye',
   },
-  { id: 'loyal', name: 'Fedele di Artù', faction: 'good', description: 'Nessun potere speciale' },
+  {
+    id: 'GOOD_SIMPLE',
+    name: 'Fedele di Artù',
+    faction: 'GOOD',
+    description: 'Nessun potere speciale',
+    icon: 'shield',
+  },
 
   {
-    id: 'assassin',
+    id: 'ASSASSIN',
     name: 'Assassino',
-    faction: 'evil',
+    faction: 'EVIL',
     description: 'Può tentare di assassinare Merlino',
+    icon: 'dagger',
   },
   {
-    id: 'morgana',
+    id: 'MORGANA',
     name: 'Morgana',
-    faction: 'evil',
+    faction: 'EVIL',
     description: 'Appare come Merlino a Percival',
+    icon: 'ghost',
   },
-  { id: 'mordred', name: 'Mordred', faction: 'evil', description: 'Invisibile a Merlino' },
-  { id: 'oberon', name: 'Oberon', faction: 'evil', description: 'Non conosce gli altri cattivi' },
   {
-    id: 'minion',
+    id: 'MORDRED',
+    name: 'Mordred',
+    faction: 'EVIL',
+    description: 'Invisibile a Merlino',
+    icon: 'skull',
+  },
+  {
+    id: 'OBERON',
+    name: 'Oberon',
+    faction: 'EVIL',
+    description: 'Non conosce gli altri cattivi',
+    icon: 'mask',
+  },
+  {
+    id: 'EVIL_SIMPLE',
     name: 'Sgherro di Mordred',
-    faction: 'evil',
+    faction: 'EVIL',
     description: 'Nessun potere speciale',
+    icon: 'minion',
   },
 ];

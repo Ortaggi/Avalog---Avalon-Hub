@@ -32,9 +32,26 @@ export const currentUserStore = signalStore(
         return null;
       }
     },
+    async logout(options?: { skipApi?: boolean }) {
+      try {
+        if (!options?.skipApi) {
+          await authService.logout();
+        }
+      } catch (error) {
+        console.error('Error logging out:', error);
+      } finally {
+        localStorage.removeItem('avalog_st');
+        patchState(store, initialState);
+        globalThis.location.href = '/auth/login';
+      }
+    },
     async fetchCurrentUser(): Promise<boolean> {
       if (store.id()) {
         return true;
+      }
+
+      if (!localStorage.getItem('avalog_st')) {
+        return false;
       }
 
       try {

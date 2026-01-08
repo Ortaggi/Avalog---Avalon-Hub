@@ -1,9 +1,14 @@
 import { inject } from '@angular/core';
-import { CanActivateFn } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 import { currentUserStore } from '../shared/current-user.store';
 
 export const authGuard: CanActivateFn = async () => {
   const store = inject(currentUserStore);
+  const router = inject(Router);
   const isAuthenticated = await store.fetchCurrentUser();
-  return isAuthenticated;
+
+  if (!isAuthenticated) {
+    return router.createUrlTree(['/auth/login']);
+  }
+  return true;
 };

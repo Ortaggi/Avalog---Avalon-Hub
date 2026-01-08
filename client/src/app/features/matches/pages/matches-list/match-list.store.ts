@@ -1,50 +1,58 @@
 import { patchState, signalStore, withHooks, withMethods, withState } from '@ngrx/signals';
-import { Game, Group } from '../../../../shared/models';
+import { Game, GameResultList, VictoryTypeList } from '../../../../shared/models';
 import { inject } from '@angular/core';
 import { GameService } from '../../../../shared/services/games.service';
-import { GroupService } from '../../../../shared/services/groups.service';
-import { currentUserStore } from '../../../../shared/current-user.store';
+
+export interface MatchListFilters {
+  startDate?: Date | null;
+  endDate?: Date | null;
+  result?: string;
+  winType?: string;
+}
+
+type GameWithResultAndWinType = Omit<Game, 'result' | 'winType'> & {
+  result?: string;
+  winType?: string;
+};
 
 interface MatchListState {
   isLoading: boolean;
-  games: Game[];
-  groups: Group[];
+  games: GameWithResultAndWinType[];
+  filters: MatchListFilters | null;
 }
 
 export const initialMatchListState: MatchListState = {
   isLoading: false,
   games: [],
-  groups: [],
+  filters: null,
 };
 
 export const MatchListStore = signalStore(
   withState(initialMatchListState),
-  withMethods(
-    (
-      store,
-      gameService = inject(GameService),
-      groupService = inject(GroupService),
-      auth = inject(currentUserStore),
-    ) => ({
-      async loadData() {
-        patchState(store, { isLoading: true });
-        try {
-          const [games, groups] = await Promise.all([
-            gameService.getByUserId(auth.id()!),
-            groupService.getByUserId(auth.id()!),
-          ]);
-          patchState(store, { games, groups });
-        } catch (error) {
-          console.error(error);
-        } finally {
-          patchState(store, { isLoading: false });
-        }
-      },
-    }),
-  ),
+  withMethods((store, gameService = inject(GameService)) => ({
+    async loadData(filters: MatchListFilters | null) {
+      // Remove null values from filters
+      if (filters) {
+        filters = Object.fromEntries(
+          Object.values(filters || {}).filter((value) => value !== null && value !== ''),
+        );
+        patchState(store, (state) => ({
+          isLoading: true,
+          filters: { ...state.filters, ...filters },
+        }));
+      }
+      const res = await gameService.getGames(filters);
+      const mappedGames = res.map((game: Game) => ({
+        ...game,
+        result: GameResultList.find((r) => r.value === game.result)?.label,
+        winType: VictoryTypeList.find((r) => r.value === game.winType)?.label,
+      }));
+      patchState(store, { games: mappedGames, isLoading: false });
+    },
+  })),
   withHooks({
     onInit(store) {
-      store.loadData();
+      store.loadData(null);
     },
   }),
 );

@@ -1,5 +1,6 @@
+import { GroupRequestType } from '../dtos/group.js';
 import { prisma } from '../lib/prisma.js';
-import { AddMemberInput, CreateGroupInput } from '../types/groups.js';
+import { AddMemberInput } from '../types/groups.js';
 
 export async function getGroups() {
   return prisma.group.findMany({
@@ -7,7 +8,7 @@ export async function getGroups() {
   });
 }
 
-export async function createGroup(data: CreateGroupInput) {
+export async function createGroup(data: GroupRequestType) {
   return prisma.group.create({
     data: {
       name: data.name,
@@ -22,10 +23,45 @@ export async function createGroup(data: CreateGroupInput) {
 }
 
 export async function getGroupById(id: string) {
-  return prisma.group.findUniqueOrThrow({
+  const group = await prisma.group.findUniqueOrThrow({
     where: { id },
-    select: { id: true, name: true },
+    select: {
+      id: true,
+      name: true,
+      memberships: {
+        select: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              nickname: true,
+            },
+          },
+          role: true,
+        },
+      },
+    },
   });
+
+  const members = group.memberships.map((m) => ({
+    id: m.user.id,
+    email: m.user.email,
+    nickname: m.user.nickname,
+    role: m.role,
+  }));
+
+  const admin = members.find((m) => m.role === 'ADMIN');
+
+  if (!admin) {
+    throw new Error('Group has no admin');
+  }
+
+  return {
+    id: group.id,
+    name: group.name,
+    adminId: admin.id,
+    members,
+  };
 }
 
 export async function updateGroup(groupId: string, name: string) {

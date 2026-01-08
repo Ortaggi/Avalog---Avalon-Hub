@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { GameArrayResponse, GameFilters, GameRequest, GameResponse, GameUpdateRequest } from '../dtos/game.js';
+import { GameArrayResponse, GameDetailResponse, GameFilters, GameRequest, GameResponse, GameUpdateRequest } from '../dtos/game.js';
 
 export const schemaGames = {
   getAll: {
@@ -24,7 +24,7 @@ export const schemaGames = {
     security: [{ BearerAuth: [] }],
     params: z.object({ id: z.uuid() }),
     response: {
-      200: GameResponse
+      200: GameDetailResponse
     },
   },
   updateById: {

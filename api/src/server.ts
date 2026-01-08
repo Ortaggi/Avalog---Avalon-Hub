@@ -38,15 +38,16 @@ async function createApp() {
   await app.register(fastifySwaggerUi, swaggerUiOptions);
 
   // Serve static files from the Angular build directory
-  const clientPath = path.resolve(__dirname, '../../client/dist/avalog-fe/browser');
+  const clientPath = path.resolve(__dirname, process.env.CLIENT_PATH || '');
+
+  // Register API routes
+  await app.register(routes, { prefix: '/api' });
+
   await app.register(fastifyStatic, {
     root: clientPath,
     prefix: '/',
     decorateReply: false,
   });
-
-  // Register API routes
-  await app.register(routes, { prefix: '/api' });
 
   return app;
 }
@@ -61,12 +62,7 @@ const plugin: FastifyPluginAsync = async function (fastify, opts) {
   await fastify.register(fastifySwagger, swaggerOptions);
   await fastify.register(fastifySwaggerUi, swaggerUiOptions);
 
-  const clientPath = path.resolve(__dirname, '../../client/dist');
-  await fastify.register(fastifyStatic, {
-    root: clientPath,
-    prefix: '/',
-    decorateReply: false,
-  });
+  const clientPath = path.resolve('/usr/share/nginx/html');
 
   await fastify.register(routes, { prefix: '/api' });
 };

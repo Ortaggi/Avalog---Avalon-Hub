@@ -21,19 +21,16 @@ export class LoginComponent {
   isLoading = false;
 
   async onSubmit(): Promise<void> {
-    console.log('Login submitted:', this.email, this.password);
-    this.authStore
-      .login(this.email, this.password)
-      .then((result) => {
-        if (result?.token) {
-          this.router.navigate(['/dashboard']);
-        } else {
-          this.errorMessage = 'Invalid email or password.';
-        }
-      })
-      .catch((error) => {
-        console.error('Login error:', error);
-        this.errorMessage = 'An error occurred during login. Please try again.';
-      });
+    try {
+      const result = await this.authStore.login(this.email, this.password);
+      if (result?.token) {
+        this.router.navigate(['/dashboard']);
+      } else {
+        this.errorMessage = 'Invalid email or password.';
+      }
+    } catch (error) {
+      console.error(error);
+      this.errorMessage = `An error occurred during login. Please try again.`;
+    }
   }
 }

@@ -59,7 +59,6 @@ export const dashboardHomeStore = signalStore(
             statService.getStatistics(userId),
             gameService.getGames(),
           ]);
-          console.log('Statistics: ', statistics, ' game: ', matches);
           patchState(store, { statistics, matches });
         } catch (error) {
           console.error('Error loading dashboard data:', error);

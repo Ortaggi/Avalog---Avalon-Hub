@@ -1,1 +1,161 @@
-<p>match-create works!</p>
+<div class="match-create container mt-4">
+  <div class="page-header d-flex justify-content-between align-items-center mb-4">
+    @if (store.game().id) {
+      <h1 class="page-title">Partita del {{ store.game().playedAt | date: 'dd/MM/yyyy HH:mm' }}</h1>
+    } @else {
+      <h1 class="page-title">Nuova Partita</h1>
+    }
+    <button class="btn btn-primary" (click)="saveGame()">Salva</button>
+  </div>
+  @if (store.isLoading()) {
+    <div class="loading">
+      <div class="spinner"></div>
+    </div>
+  } @else {
+    @if (store.game().groupId) {
+      <div class="row mb-4">
+        <div class="col-md-4">
+          <div class="form-group mb-3">
+            <label for="group" class="form-label">Gruppo</label>
+            <select
+              id="group"
+              [ngModel]="store.game().groupId"
+              (ngModelChange)="store.updateGame({ groupId: $event })"
+              class="form-select"
+            >
+              <option [value]="''" disabled>Seleziona Gruppo</option>
+              @for (group of store.availableGroups(); track group.id) {
+                <option [value]="group.id">{{ group.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group mb-3">
+            <label for="result" class="form-label">Risultato</label>
+            <select
+              id="result"
+              [ngModel]="store.game().result"
+              (ngModelChange)="store.updateGame({ result: $event })"
+              class="form-select"
+            >
+              @for (res of gamesResults; track res.value) {
+                <option [value]="res.value">{{ res.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group mb-3">
+            <label for="winType" class="form-label">Tipo Vittoria</label>
+            <select
+              id="winType"
+              [ngModel]="store.game().winType"
+              (ngModelChange)="store.updateGame({ winType: $event })"
+              class="form-select"
+            >
+              @for (type of winTypes; track type.value) {
+                <option [value]="type.value">{{ type.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Partecipanti</h3>
+        <button class="btn btn-outline-primary" (click)="store.addParticipant()">
+          <i class="bi bi-person-plus"></i> Aggiungi Persona
+        </button>
+      </div>
+
+      <div class="participants-list">
+        @for (participant of store.game().participants; track $index) {
+          <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+              <div class="row align-items-end">
+                <div class="col-md-3">
+                  <label for="participant-userId" class="form-label">Utente</label>
+                  <select
+                    id="participant-userId"
+                    [ngModel]="participant.userId"
+                    (ngModelChange)="store.updateParticipant($index, { userId: $event })"
+                    class="form-select"
+                  >
+                    <option [value]="''" disabled>Seleziona Utente</option>
+                    @for (user of store.availableUsers(); track user.id) {
+                      <option [value]="user.id" [disabled]="isUserTaken(user.id)">
+                        {{ user.nickname }}
+                      </option>
+                    }
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="participant-faction" class="form-label">Fazione</label>
+                  <select
+                    id="participant-faction"
+                    [ngModel]="participant.faction"
+                    (ngModelChange)="store.updateParticipant($index, { faction: $event })"
+                    class="form-select"
+                  >
+                    <option value="GOOD">Buoni</option>
+                    <option value="EVIL">Cattivi</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="participant-role" class="form-label">Ruolo</label>
+                  <select
+                    id="participant-role"
+                    [ngModel]="participant.role"
+                    (ngModelChange)="store.updateParticipant($index, { role: $event })"
+                    class="form-select"
+                  >
+                    @for (role of roles; track role.id) {
+                      @if (role.faction === participant.faction) {
+                        <option
+                          [value]="role.id"
+                          [disabled]="
+                            role.id !== 'GOOD_SIMPLE' &&
+                            role.id !== 'EVIL_SIMPLE' &&
+                            isRoleTaken(role.id)
+                          "
+                        >
+                          {{ role.name }}
+                        </option>
+                      }
+                    }
+                  </select>
+                </div>
+                <div class="col-md-3 text-end">
+                  <button
+                    class="btn btn-outline-danger"
+                    (click)="store.removeParticipant($index)"
+                    [disabled]="(store.game().participants?.length || 0) <= 1"
+                  >
+                    <i class="bi bi-trash"></i> Rimuovi
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="text-center p-5">
+        <h3 class="text-light-muted">Seleziona un gruppo per iniziare</h3>
+        <div class="col-md-6 mx-auto mt-4">
+          <select
+            [ngModel]="store.game().groupId"
+            (ngModelChange)="store.updateGame({ groupId: $event })"
+            class="form-select form-select-lg"
+          >
+            <option [value]="''" disabled>Seleziona Gruppo</option>
+            @for (group of store.availableGroups(); track group.id) {
+              <option [value]="group.id">{{ group.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    }
+  }
+</div>
