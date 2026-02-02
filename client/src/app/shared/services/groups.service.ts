@@ -13,4 +13,8 @@ export class GroupService {
   getByUserId(userId: string) {
     return this.service.getById<any>('groups/user', userId);
   }
+
+  getById(groupId: string) {
+    return this.service.getById<any>('groups', groupId);
+  }
 }
