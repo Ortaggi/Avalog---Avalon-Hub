@@ -1,9 +1,8 @@
 name: Deploy to Hostinger
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
 
 jobs:
   build-and-deploy:
@@ -23,14 +22,13 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./client
-        env:
-          NG_APP_ENV: ${{ secrets.NG_APP_ENV }}
         run: npm ci
 
       - name: Build Angular app
+        working-directory: ./client
         env:
           NG_APP_ENV: ${{ secrets.NG_APP_ENV }}
-        working-directory: ./client
+          NG_APP_SERVER_TYPE: ${{ secrets.NG_APP_SERVER_TYPE }}
         run: ng build
 
       - name: List build output
@@ -50,7 +48,7 @@ jobs:
         run: |
           rsync -avz --delete \
             -e "ssh -i ~/.ssh/deploy_key" \
-            client/dist/avalog-fe/browser/ \
+            ./client/dist/avalog-fe/browser/ \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
 
       - name: Cleanup
