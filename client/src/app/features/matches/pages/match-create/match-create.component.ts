@@ -2,16 +2,24 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AuthService, GroupService, MatchService, UserService } from '../../../../core/services';
+import { AuthService } from '../../../auth/auth.service';
+import { GroupService } from '../../../../shared/services/groups.service';
+import { UsersService } from '../../../../shared/services/users.service';
+import { GameService } from '../../../../shared/services/games.service';
+import { AVALON_ROLES, Faction } from '../../../../shared/models/roles';
 import {
-  AVALON_ROLES,
-  Faction,
-  Group,
-  Match,
-  PlayerMatch,
-  User,
-  VictoryType
-} from '../../../../core/models';
+  GameDetail,
+  GameFactionType,
+  GameRolesType,
+  VictoryType,
+  GameResultType,
+} from '../../../../shared/models/games';
+import { Group } from '../../../../shared/models/groups';
+
+interface User {
+  id: string;
+  displayName: string;
+}
 
 interface PlayerSelection {
   user: User;
@@ -22,15 +30,16 @@ interface PlayerSelection {
 @Component({
   selector: 'app-match-create',
   imports: [CommonModule, FormsModule, RouterModule],
+  providers: [UsersService, GroupService, GameService],
   standalone: true,
   templateUrl: './match-create.component.html',
-  styleUrl: './match-create.component.scss'
+  styleUrl: './match-create.component.scss',
 })
 export class MatchCreateComponent implements OnInit {
   private authService = inject(AuthService);
-  private matchService = inject(MatchService);
+  private gameService = inject(GameService);
   private groupService = inject(GroupService);
-  private userService = inject(UserService);
+  private userService = inject(UsersService);
   private router = inject(Router);
 
   currentStep = 1;
@@ -42,8 +51,8 @@ export class MatchCreateComponent implements OnInit {
   // Form Data
   selectedGroupId = '';
   matchDate = new Date().toISOString().split('T')[0];
-  winningFaction: Faction = 'good';
-  victoryType: VictoryType = 'missions';
+  winningFaction: 'good' | 'evil' = 'good';
+  victoryType: 'missions' | 'assassination' = 'missions';
   notes = '';
 
   //Stati
@@ -58,7 +67,7 @@ export class MatchCreateComponent implements OnInit {
   private async loadGroups(): Promise<void> {
     this.isLoading = true;
     try {
-      const user = this.authService.getCurrentUser();
+      const user = await this.authService.me();
       if (user) {
         this.groups = await this.groupService.getByUserId(user.id);
       }
@@ -82,18 +91,14 @@ export class MatchCreateComponent implements OnInit {
       const group = await this.groupService.getById(this.selectedGroupId);
 
       console.log('onGroupChange - group trovato:', group);
-      console.log('onGroupChange - memberIds:', group?.memberIds);
+      console.log('onGroupChange - memberIds:', group?.members);
 
-      if (group) {
-        const users: PlayerSelection[] = [];
-        for (const memberId of group.memberIds) {
-          console.log('onGroupChange - carico membro:', memberId);
-          const user = await this.userService.getById(memberId);
-          console.log('onGroupChange - user trovato:', user);
-          if (user) {
-            users.push({ user, selected: false, roleId: '' });
-          }
-        }
+      if (group && group.members) {
+        const users: PlayerSelection[] = group.members.map((member: any) => ({
+          user: { id: member.id, displayName: member.displayName },
+          selected: false,
+          roleId: '',
+        }));
         this.players = users;
         console.log('onGroupChange - players finali:', this.players);
       }
@@ -136,16 +141,18 @@ export class MatchCreateComponent implements OnInit {
     return uniqueRoles.length === uniqueSet.size;
   }
 
-  getRolesForFaction(faction: Faction) {
-    return this.roles.filter((r) => r.faction === faction);
+  getRolesForFaction(faction: 'good' | 'evil') {
+    const factionUpper: Faction = faction.toUpperCase() as Faction;
+    return this.roles.filter((r) => r.faction === factionUpper);
   }
 
   getRoleName(roleId: string): string {
     return this.roles.find((r) => r.id === roleId)?.name || roleId;
   }
 
-  getRoleFaction(roleId: string): Faction | undefined {
-    return this.roles.find((r) => r.id === roleId)?.faction;
+  getRoleFaction(roleId: string): 'good' | 'evil' | undefined {
+    const faction = this.roles.find((r) => r.id === roleId)?.faction;
+    return faction ? (faction.toLowerCase() as 'good' | 'evil') : undefined;
   }
 
   nextStep(): void {
@@ -183,28 +190,36 @@ export class MatchCreateComponent implements OnInit {
     this.errorMessage = '';
 
     try {
-      const user = this.authService.getCurrentUser();
+      const user = await this.authService.me();
       if (!user) {
         this.errorMessage = 'Utente non autenticato';
         return;
       }
 
-      const players: PlayerMatch[] = this.getSelectedPlayers().map((p) => ({
-        idPlayer: p.user.id,
-        idRole: p.roleId
-      }));
+      const result: GameResultType = this.winningFaction === 'good' ? 'GOOD_WIN' : 'EVIL_WIN';
+      const winType: VictoryType =
+        this.victoryType === 'missions' ? 'THREE_MISSIONS' : 'ASSASSINATION';
 
-      const matchData: Omit<Match, 'id' | 'createdAt'> = {
+      const participants = this.getSelectedPlayers().map((p) => {
+        const role = this.roles.find((r) => r.id === p.roleId);
+        return {
+          userId: p.user.id,
+          role: p.roleId as GameRolesType,
+          faction: (role?.faction as GameFactionType) || 'GOOD',
+          nickname: p.user.displayName,
+        };
+      });
+
+      const gameData: Partial<GameDetail> = {
         groupId: this.selectedGroupId,
-        date: new Date(this.matchDate),
-        players,
-        winningFaction: this.winningFaction,
-        victoryType: this.victoryType,
+        playedAt: new Date(this.matchDate),
+        result,
+        winType,
         notes: this.notes || undefined,
-        createdBy: user.id
+        participants,
       };
 
-      await this.matchService.create(matchData);
+      await this.gameService.createGame(gameData as GameDetail);
       this.router.navigate(['/matches']);
     } catch (error) {
       console.error('Errore salvataggio partita:', error);

@@ -1,0 +1,70 @@
+<div class="row h-100 align-items-center flex-wrap-reverse">
+  <div class="col-12 col-md-4 offset-md-1">
+    <div class="card bg-medium-grey border border-gold">
+      <div class="card-header text-center border-0">
+        <h2 class="text-gold">Avalog</h2>
+        <p class="text-light-muted">Accedi per continuare</p>
+      </div>
+      <div class="card-body">
+        <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+          @if (errorMessage) {
+            <div class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
+          }
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              name="email"
+              [(ngModel)]="email"
+              required
+              email
+              placeholder="Email"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              [(ngModel)]="password"
+              required
+              minlength="6"
+              placeholder="Password"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary w-100"
+            [disabled]="loginForm.invalid || isLoading"
+          >
+            @if (isLoading) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Accesso in corso...
+            } @else {
+              Accedi
+            }
+          </button>
+        </form>
+      </div>
+
+      <div class="card-footer text-center border-0">
+        <div class="border-top border-light-grey pt-3">
+          <p class="text-light-muted">
+            Non hai un account? <a routerLink="/auth/register">Registrati</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-6">
+    <img alt="Avalon Logo" class="img-fluid" src="logo_avalog_nobg.png" />
+  </div>
+</div>

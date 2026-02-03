@@ -13,7 +13,6 @@ yarn-error.log
 
 # IDEs and editors
 .idea/
-.vscode/
 .project
 .classpath
 .c9/
@@ -37,14 +36,8 @@ yarn-error.log
 /libpeerconnection.log
 testem.log
 /typings
+__screenshots__/
 
 # System files
 .DS_Store
 Thumbs.db
-/package-lock.json
-
-/src/app/core/config/envs/local.ts
-/src/app/core/config/envs/prod.ts
-.env
-environment.d.ts
-

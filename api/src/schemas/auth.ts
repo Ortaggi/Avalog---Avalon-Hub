@@ -1,33 +1,28 @@
-import { z } from 'zod';
+import { LoginRequestUser, LoginResponse, RegisterRequestUser, UserResponse } from '../dtos/user.js';
 
 export const schemaAuth = {
   register: {
     tags: ['Auth'],
     description: 'Register new user',
-    body: z.object({
-      email: z.string().email(),
-      password: z.string().min(8),
-      nickname: z.string().optional(),
-    }),
+    body: RegisterRequestUser,
     response: {
-      201: z.object({
-        id: z.string(),
-        email: z.string(),
-      }),
+      201: UserResponse,
     },
   },
   login: {
     tags: ['Auth'],
     description: 'Login with credentials',
 
-    body: z.object({
-      email: z.string().email(),
-      password: z.string(),
-    }),
+    body: LoginRequestUser,
     response: {
-      200: z.object({
-        token: z.string(),
-      }),
+      200: LoginResponse,
+    },
+  },
+  me: {
+    tags: ['Auth'],
+    description: 'Get current authenticated user',
+    response: {
+      200: UserResponse,
     },
   },
 };

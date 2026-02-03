@@ -19,7 +19,7 @@ WORKDIR /opt/app/api
 RUN npm install
 
 # Copy built client files to nginx html directory
-COPY --from=builder /opt/app/client/dist/avalog-fe/browser/ /usr/share/nginx/html
+COPY --from=builder /opt/app/client/dist/client/browser/ /usr/share/nginx/html
 
 # Copy nginx configuration
 COPY api/nginx.conf /etc/nginx/nginx.conf

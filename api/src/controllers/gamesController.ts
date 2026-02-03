@@ -1,7 +1,17 @@
+import { GameDetailResponseType, GameFiltersType, GameRequestType, GameUpdateRequestType } from '../dtos/game.js';
 import { prisma } from '../lib/prisma.js';
-import { CreateGameInput } from '../types/games.js';
 
-export async function getGames() {
+export async function getGames(filters: GameFiltersType) {
+  const queryFilters: any = {};
+  if (filters?.startDate || filters?.endDate) {
+    queryFilters.playedAt = {
+      ...(filters.startDate && { gte: new Date(filters.startDate) }),
+      ...(filters.endDate && { lte: new Date(filters.endDate) }),
+    };
+  }
+
+  if (filters?.result) queryFilters.result = filters.result;
+  if (filters?.winType) queryFilters.winType = filters.winType;
   const games = await prisma.game.findMany({
     select: {
       id: true,
@@ -11,6 +21,7 @@ export async function getGames() {
       notes: true,
       playedAt: true,
     },
+    where: queryFilters,
   });
 
   return games.map((game) => ({
@@ -19,7 +30,7 @@ export async function getGames() {
   }));
 }
 
-export async function createGame(data: CreateGameInput) {
+export async function createGame(data: GameRequestType) {
   return prisma.game.create({
     data: {
       groupId: data.groupId,
@@ -40,19 +51,41 @@ export async function createGame(data: CreateGameInput) {
   });
 }
 
-export async function getGameById(gameId: string) {
+export async function getGameById(gameId: string): Promise<GameDetailResponseType> {
   const game = await prisma.game.findUniqueOrThrow({
     where: { id: gameId },
     include: {
-      participants: true,
+      group: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      participants: {
+        include: {
+          user: {
+            select: {
+              nickname: true,
+            },
+          },
+        },
+      },
     },
   });
-  return { ...game, playedAt: game.playedAt.toISOString() };
+
+  return {
+    ...game,
+    playedAt: game.playedAt.toISOString(),
+    participants: game.participants.map((p) => ({
+      ...p,
+      nickname: p.user.nickname,
+    })),
+  };
 }
 
 export async function updateGame(
   gameId: string,
-  data: Partial<CreateGameInput>,
+  data: GameUpdateRequestType,
 ) {
   const { participants, ...gameData } = data;
 

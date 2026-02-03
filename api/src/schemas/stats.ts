@@ -1,42 +1,14 @@
 import { z } from 'zod';
+import { Role, UserStatsResponse } from '../dtos/stats.js';
 
 export const schemaStats = {
   getByUserId: {
     tags: ['Stats'],
     description: 'Get statistics for a specific user',
     security: [{ BearerAuth: [] }],
-    params: z.object({ userId: z.string().uuid() }),
+    params: z.object({ userId: z.uuid() }),
     response: {
-      200: z.object({
-        totalGames: z.number(),
-        wins: z.number(),
-        goodWins: z.number(),
-        evilWins: z.number(),
-        mostPlayedRole: z
-          .enum([
-            'MERLIN',
-            'PERCIVAL',
-            'GOOD_SIMPLE',
-            'ASSASSIN',
-            'MORGANA',
-            'MORDRED',
-            'OBERON',
-            'EVIL_SIMPLE',
-          ])
-          .nullable(),
-        bestRole: z
-          .enum([
-            'MERLIN',
-            'PERCIVAL',
-            'GOOD_SIMPLE',
-            'ASSASSIN',
-            'MORGANA',
-            'MORDRED',
-            'OBERON',
-            'EVIL_SIMPLE',
-          ])
-          .nullable(),
-      }),
+      200: UserStatsResponse,
     },
   },
   leaderboard: {
@@ -46,23 +18,12 @@ export const schemaStats = {
     querystring: z.object({
       minGames: z.number().optional(),
       faction: z.enum(['GOOD', 'EVIL']).optional(),
-      role: z
-        .enum([
-          'MERLIN',
-          'PERCIVAL',
-          'GOOD_SIMPLE',
-          'ASSASSIN',
-          'MORGANA',
-          'MORDRED',
-          'OBERON',
-          'EVIL_SIMPLE',
-        ])
-        .optional(),
+      role: Role.optional(),
     }),
     response: {
       200: z.array(
         z.object({
-          userId: z.string().uuid(),
+          userId: z.uuid(),
           nickname: z.string().nullable(),
           winRate: z.number(),
           totalGames: z.number(),
