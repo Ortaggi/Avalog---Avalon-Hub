@@ -22,7 +22,7 @@ services:
     image: avalog/api:latest
     build:
       context: ./
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile  
     container_name: avalog_api
     restart: always
     ports:
@@ -30,6 +30,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    env_file:
+      - ./client/.env
 
 volumes:
   postgres_data:
