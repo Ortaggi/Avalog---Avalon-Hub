@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -41,7 +41,6 @@ export class MatchCreateComponent implements OnInit {
   private groupService = inject(GroupService);
   private userService = inject(UsersService);
   private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef);
 
   currentStep = 1;
 
@@ -57,7 +56,7 @@ export class MatchCreateComponent implements OnInit {
   notes = '';
 
   //Stati
-  isLoading = true;
+  isLoading = false;
   isSaving = false;
   errorMessage = '';
 
@@ -66,25 +65,18 @@ export class MatchCreateComponent implements OnInit {
   }
 
   private async loadGroups(): Promise<void> {
-    console.log('🔄 loadGroups: START - isLoading =', this.isLoading);
     this.isLoading = true;
     try {
-      console.log('👤 Getting current user...');
       const user = await this.authService.me();
-      console.log('👤 User:', user);
       if (user) {
-        console.log('📦 Getting groups for user:', user.id);
         this.groups = await this.groupService.getByUserId(user.id);
-        console.log('✅ Groups loaded:', this.groups);
+        //console.log("gruppi caricati")
       }
     } catch (error) {
-      console.error('❌ Errore nel caricamento dei gruppi:', error);
+      console.error('Errore nel caricamento dei gruppi:', error);
       this.errorMessage = 'Errore nel caricamento dei gruppi.';
     } finally {
-      console.log('✅ loadGroups: FINALLY - setting isLoading to false');
       this.isLoading = false;
-      this.cdr.detectChanges();
-      console.log('✅ loadGroups: END - isLoading =', this.isLoading);
     }
   }
 
