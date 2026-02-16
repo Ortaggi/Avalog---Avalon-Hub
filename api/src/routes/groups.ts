@@ -7,6 +7,7 @@ import {
   deleteGroup,
   getGroupById,
   getGroups,
+  getGroupsByUserId,
   listMembers,
   removeMember,
   updateGroup,
@@ -20,6 +21,15 @@ export async function groupsRoutes(app: FastifyTypedInstance) {
       schema: schemaGroups.getAll,
     },
     async () => getGroups(),
+  );
+
+  app.get(
+    '/user/:userId',
+    {
+      preHandler: [authenticate],
+      schema: schemaGroups.getByUserId,
+    },
+    async (request) => getGroupsByUserId(request.params.userId),
   );
 
   app.post(

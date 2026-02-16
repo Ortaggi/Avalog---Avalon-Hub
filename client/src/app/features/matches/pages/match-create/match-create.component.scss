@@ -1,7 +1,7 @@
 @use '../../../../../styles/variables' as vars;
 
 .match-create {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   padding-bottom: 2rem;
 }
@@ -9,13 +9,19 @@
 .page-title {
   color: vars.$accent-gold;
   font-size: 2rem;
+  margin: 0;
 }
 
+// === PROGRESS INDICATOR ===
 .steps-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0;
+  background: vars.$bg-medium;
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid vars.$bg-light;
 }
 
 .step {
@@ -24,10 +30,15 @@
   align-items: center;
   cursor: pointer;
   padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
 
-  .step-number {
-    width: 40px;
-    height: 40px;
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  .step-circle {
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background-color: vars.$bg-light;
     color: vars.$text-muted;
@@ -35,85 +46,158 @@
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    margin-bottom: 0.5rem;
-    transition: all 0.3s;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+  }
+
+  .step-number,
+  .step-check {
+    font-size: 1.2rem;
   }
 
   .step-label {
     font-size: 0.875rem;
     color: vars.$text-muted;
     transition: color 0.3s;
+    font-weight: 500;
   }
 
   &.active {
-    .step-number {
+    .step-circle {
       background-color: vars.$accent-gold;
       color: vars.$bg-dark;
+      border-color: vars.$accent-gold;
+      box-shadow: 0 0 20px rgba(vars.$accent-gold, 0.5);
+      transform: scale(1.1);
     }
 
     .step-label {
       color: vars.$accent-gold;
+      font-weight: 600;
     }
   }
 
   &.completed {
-    .step-number {
+    .step-circle {
       background-color: vars.$success;
       color: white;
+      border-color: vars.$success;
     }
+
+    .step-check {
+      animation: checkmark-pop 0.3s ease;
+    }
+  }
+}
+
+@keyframes checkmark-pop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 
 .step-connector {
-  width: 60px;
-  height: 2px;
+  width: 80px;
+  height: 3px;
   background-color: vars.$bg-light;
-  margin-bottom: 1.5rem;
-  transition: background-color 0.3s;
+  margin-bottom: 2.5rem;
+  transition: all 0.3s ease;
+  position: relative;
 
   &.active {
     background-color: vars.$success;
+    box-shadow: 0 0 10px rgba(vars.$success, 0.5);
   }
 }
 
+// === ANIMATIONS ===
+.fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// === CARDS ===
 .card {
   background-color: vars.$bg-medium;
   border: 1px solid vars.$bg-light;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &.border-gold {
+    border-color: vars.$accent-gold;
+    box-shadow: 0 0 20px rgba(vars.$accent-gold, 0.2);
+  }
 
   .card-header {
     background-color: vars.$bg-dark;
-    border-bottom: 1px solid vars.$bg-light;
-    padding: 1rem 1.5rem;
+    border-bottom: 2px solid vars.$bg-light;
+    padding: 1.5rem;
+
+    &.bg-dark-grey {
+      background-color: vars.$bg-dark;
+    }
 
     h3 {
-      margin: 0;
+      margin: 0 0 0.5rem 0;
       color: vars.$accent-gold;
-      font-size: 1.2rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      color: vars.$text-muted;
+      font-size: 0.9rem;
     }
   }
 
   .card-body {
-    padding: 1.5rem;
+    padding: 2rem;
   }
 }
 
+// === FORMS ===
 .form-label {
   color: vars.$text-light;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  display: block;
+  font-size: 1rem;
 }
 
 .form-select,
 .form-control {
   background-color: vars.$bg-light;
-  border-color: vars.$bg-light;
+  border: 2px solid vars.$bg-light;
   color: vars.$text-light;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 
   &:focus {
     background-color: vars.$bg-light;
     border-color: vars.$accent-gold;
     color: vars.$text-light;
     box-shadow: 0 0 0 0.2rem rgba(vars.$accent-gold, 0.25);
+    outline: none;
   }
 
   option,
@@ -123,170 +207,405 @@
   }
 }
 
+// === PLAYER CARDS (Step 2) ===
 .players-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
 }
 
-.player-checkbox {
+.player-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background-color: vars.$bg-light;
-  border-radius: 8px;
+  padding: 1.5rem 1rem;
+  background: linear-gradient(135deg, vars.$bg-light 0%, vars.$bg-medium 100%);
+  border: 2px solid transparent;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  position: relative;
 
   &:hover {
-    background-color: lighten(vars.$bg-light, 5%);
+    transform: translateY(-5px);
+    border-color: vars.$accent-gold;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   }
 
   &.selected {
-    background-color: rgba(vars.$accent-gold, 0.2);
-    border: 1px solid vars.$accent-gold;
+    border-color: vars.$accent-gold;
+    background: linear-gradient(135deg, rgba(vars.$accent-gold, 0.15) 0%, vars.$bg-medium 100%);
+    box-shadow: 0 0 20px rgba(vars.$accent-gold, 0.4);
+    transform: translateY(-3px);
   }
 
-  input[type='checkbox'] {
-    width: 18px;
-    height: 18px;
-    accent-color: vars.$accent-gold;
+  .player-avatar {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    background: vars.$bg-dark;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    border: 3px solid vars.$bg-light;
+    transition: all 0.3s ease;
+
+    .avatar-icon {
+      font-size: 2rem;
+    }
+
+    .checkmark {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 25px;
+      height: 25px;
+      background: vars.$success;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 0.9rem;
+      animation: checkmark-pop 0.3s ease;
+    }
   }
 
-  label {
-    color: vars.$text-light;
-    cursor: pointer;
-    margin: 0;
+  &.selected .player-avatar {
+    border-color: vars.$accent-gold;
+    box-shadow: 0 0 15px rgba(vars.$accent-gold, 0.5);
+  }
+
+  .player-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+
+    .player-name {
+      color: vars.$text-light;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    .player-status {
+      color: vars.$success;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+  }
+}
+
+// === ROLES SECTION (Step 3) ===
+.faction-section {
+  margin-bottom: 2rem;
+
+  .faction-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &.good {
+      background: linear-gradient(135deg, rgba(vars.$good-faction, 0.3) 0%, transparent 100%);
+      color: lighten(vars.$good-faction, 40%);
+      border-left: 4px solid vars.$good-faction;
+    }
+
+    &.evil {
+      background: linear-gradient(135deg, rgba(vars.$evil-faction, 0.3) 0%, transparent 100%);
+      color: lighten(vars.$evil-faction, 40%);
+      border-left: 4px solid vars.$evil-faction;
+    }
+  }
+
+  .empty-faction-message {
+    padding: 1.5rem;
+    text-align: center;
+    background: vars.$bg-light;
+    border-radius: 8px;
+    border: 2px dashed vars.$text-muted;
   }
 }
 
 .roles-assignment {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .role-row {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.75rem;
+  padding: 1rem;
   background-color: vars.$bg-light;
   border-radius: 8px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
 
-  .player-name {
-    min-width: 150px;
-    color: vars.$text-light;
-    font-weight: 500;
+  &:hover {
+    border-color: vars.$accent-gold;
+    background-color: lighten(vars.$bg-light, 3%);
+  }
+
+  .player-info-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 180px;
+
+    .player-avatar-small {
+      font-size: 1.5rem;
+    }
+
+    .player-name {
+      color: vars.$text-light;
+      font-weight: 600;
+    }
   }
 
   .role-select {
     flex: 1;
+    max-width: 300px;
   }
 
   .faction-badge {
-    padding: 0.25rem 0.75rem;
+    padding: 0.4rem 1rem;
     border-radius: 20px;
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
 
     &.good {
       background-color: rgba(vars.$good-faction, 0.3);
-      color: lighten(vars.$good-faction, 30%);
+      color: lighten(vars.$good-faction, 35%);
+      border: 1px solid vars.$good-faction;
     }
 
     &.evil {
       background-color: rgba(vars.$evil-faction, 0.3);
-      color: lighten(vars.$evil-faction, 30%);
+      color: lighten(vars.$evil-faction, 35%);
+      border: 1px solid vars.$evil-faction;
     }
   }
 }
 
+// === FACTION BALANCE ===
+.faction-balance {
+  margin-top: 1.5rem;
+
+  .balance-bar {
+    display: flex;
+    height: 40px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid vars.$bg-light;
+  }
+
+  .balance-good,
+  .balance-evil {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .balance-good {
+    background: linear-gradient(
+      135deg,
+      vars.$good-faction 0%,
+      lighten(vars.$good-faction, 10%) 100%
+    );
+    color: white;
+  }
+
+  .balance-evil {
+    background: linear-gradient(
+      135deg,
+      vars.$evil-faction 0%,
+      lighten(vars.$evil-faction, 10%) 100%
+    );
+    color: white;
+  }
+
+  .balance-text {
+    padding: 0 0.5rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  }
+}
+
+// === FACTION/VICTORY CARDS (Step 4) ===
 .faction-selection,
 .victory-selection {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
-.faction-option,
-.victory-option {
+.faction-card,
+.victory-card {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1.5rem;
-  background-color: vars.$bg-light;
-  border: 2px solid transparent;
-  border-radius: 8px;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  background: vars.$bg-light;
+  border: 3px solid transparent;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  position: relative;
+  min-height: 180px;
 
   &:hover {
-    background-color: lighten(vars.$bg-light, 5%);
+    transform: translateY(-5px) scale(1.02);
+    border-color: vars.$accent-gold;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
   }
 
   &.selected {
     border-color: vars.$accent-gold;
+    box-shadow: 0 0 30px rgba(vars.$accent-gold, 0.5);
+    background: linear-gradient(135deg, rgba(vars.$accent-gold, 0.1) 0%, vars.$bg-light 100%);
   }
 
-  .faction-icon,
-  .victory-icon {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
+  .faction-icon-large,
+  .victory-icon-large {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: icon-float 3s ease-in-out infinite;
   }
 
   .faction-name,
   .victory-name {
     color: vars.$text-light;
-    font-weight: 500;
+    font-weight: 700;
+    font-size: 1.2rem;
     text-align: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .victory-description {
+    color: vars.$text-muted;
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  .selected-indicator {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: vars.$accent-gold;
+    color: vars.$bg-dark;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    animation: pulse 2s infinite;
   }
 }
 
-.faction-option {
+@keyframes icon-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(vars.$accent-gold, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(vars.$accent-gold, 0.8);
+  }
+}
+
+.faction-card {
   &.good.selected {
     border-color: vars.$good-faction;
-    background-color: rgba(vars.$good-faction, 0.1);
+    background: linear-gradient(135deg, rgba(vars.$good-faction, 0.15) 0%, vars.$bg-light 100%);
   }
 
   &.evil.selected {
     border-color: vars.$evil-faction;
-    background-color: rgba(vars.$evil-faction, 0.1);
+    background: linear-gradient(135deg, rgba(vars.$evil-faction, 0.15) 0%, vars.$bg-light 100%);
   }
 }
 
+// === SUMMARY ===
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .summary-item {
-  text-align: center;
-  padding: 1rem;
-  background-color: vars.$bg-light;
-  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: vars.$bg-light;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: vars.$accent-gold;
+    transform: translateY(-2px);
+  }
+
+  .summary-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+  }
 
   .summary-label {
-    display: block;
     color: vars.$text-muted;
-    font-size: 0.875rem;
-    margin-bottom: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   .summary-value {
-    display: block;
     color: vars.$text-light;
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 700;
 
-    &.good {
-      color: lighten(vars.$good-faction, 20%);
+    &.text-good {
+      color: lighten(vars.$good-faction, 35%);
     }
 
-    &.evil {
-      color: lighten(vars.$evil-faction, 20%);
+    &.text-evil {
+      color: lighten(vars.$evil-faction, 35%);
     }
   }
 }
@@ -294,116 +613,230 @@
 .players-summary {
   h4 {
     color: vars.$text-light;
-    font-size: 1rem;
+    font-size: 1.2rem;
     margin-bottom: 1rem;
+    font-weight: 600;
   }
 }
 
-.players-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+.players-list-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 0.75rem;
 }
 
-.player-summary-item {
+.player-summary-card {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  background-color: vars.$bg-light;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: vars.$bg-light;
   border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
 
-  .player-name {
-    color: vars.$text-light;
-    font-size: 0.875rem;
+  &:hover {
+    border-color: vars.$accent-gold;
+    transform: translateX(5px);
   }
 
-  .role-badge {
-    padding: 0.2rem 0.5rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
+  .player-summary-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .player-avatar-small {
+      font-size: 1.5rem;
+    }
+
+    .player-name {
+      color: vars.$text-light;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+  }
+
+  .role-badge-large {
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
 
     &.good {
       background-color: rgba(vars.$good-faction, 0.3);
-      color: lighten(vars.$good-faction, 30%);
+      color: lighten(vars.$good-faction, 35%);
+      border: 1px solid vars.$good-faction;
     }
 
     &.evil {
       background-color: rgba(vars.$evil-faction, 0.3);
-      color: lighten(vars.$evil-faction, 30%);
+      color: lighten(vars.$evil-faction, 35%);
+      border: 1px solid vars.$evil-faction;
     }
   }
 }
 
+// === BUTTONS ===
 .step-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid vars.$bg-light;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid vars.$bg-light;
+  gap: 1rem;
 }
 
-.btn-primary {
-  background-color: vars.$primary;
-  border-color: vars.$primary;
-
-  &:hover:not(:disabled) {
-    background-color: darken(vars.$primary, 10%);
-  }
+.btn {
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-size: 1rem;
 
   &:disabled {
     opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+  border: none;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #a0522d 0%, #8b4513 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(139, 69, 19, 0.4);
   }
 }
 
 .btn-success {
-  background-color: vars.$success;
-  border-color: vars.$success;
+  background: linear-gradient(135deg, vars.$success 0%, darken(vars.$success, 10%) 100%);
+  border: none;
+  color: white;
 
   &:hover:not(:disabled) {
-    background-color: darken(vars.$success, 10%);
+    background: linear-gradient(135deg, darken(vars.$success, 10%) 0%, vars.$success 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(vars.$success, 0.4);
+  }
+}
+
+.save-button {
+  font-size: 1.1rem;
+  padding: 1rem 2.5rem;
+  box-shadow: 0 5px 20px rgba(vars.$success, 0.3);
+
+  &:not(:disabled) {
+    animation: pulse-subtle 2s infinite;
+  }
+}
+
+@keyframes pulse-subtle {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
   }
 }
 
 .btn-outline-secondary {
+  background: transparent;
   color: vars.$text-muted;
-  border-color: vars.$text-muted;
+  border: 2px solid vars.$text-muted;
 
   &:hover {
     background-color: vars.$bg-light;
     color: vars.$text-light;
+    border-color: vars.$text-light;
   }
 }
 
-.alert-danger {
-  background-color: rgba(vars.$danger, 0.2);
-  border-color: vars.$danger;
-  color: vars.$text-light;
-}
+// === ALERTS ===
+.alert {
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 
-.alert-warning {
-  background-color: rgba(vars.$warning, 0.2);
-  border-color: vars.$warning;
-  color: vars.$text-light;
+  &.alert-success {
+    background-color: rgba(vars.$success, 0.15);
+    border-color: vars.$success;
+    color: lighten(vars.$success, 20%);
+  }
 
-  a {
-    color: vars.$accent-gold;
+  &.alert-danger {
+    background-color: rgba(vars.$danger, 0.15);
+    border-color: vars.$danger;
+    color: lighten(vars.$danger, 20%);
+  }
+
+  &.alert-warning {
+    background-color: rgba(vars.$warning, 0.15);
+    border-color: vars.$warning;
+    color: lighten(vars.$warning, 25%);
+
+    a {
+      color: vars.$accent-gold;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+  }
+
+  &.alert-info {
+    background-color: rgba(30, 144, 255, 0.15);
+    border-color: dodgerblue;
+    color: lighten(dodgerblue, 20%);
   }
 }
 
+.badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+
+  &.bg-success {
+    background: vars.$success !important;
+    color: white;
+  }
+
+  &.bg-warning {
+    background: vars.$warning !important;
+    color: vars.$bg-dark;
+  }
+}
+
+// === SPINNER ===
 .spinner-border.text-gold {
   color: vars.$accent-gold;
 }
 
+// === RESPONSIVE ===
 @media (max-width: 768px) {
   .steps-indicator {
+    padding: 1rem;
+
     .step-label {
       display: none;
+    }
+
+    .step-circle {
+      width: 40px;
+      height: 40px;
     }
   }
 
   .step-connector {
-    width: 30px;
+    width: 40px;
   }
 
   .summary-grid {
@@ -418,12 +851,29 @@
   .role-row {
     flex-wrap: wrap;
 
-    .player-name {
+    .player-info-section {
       width: 100%;
       margin-bottom: 0.5rem;
     }
 
     .role-select {
+      width: 100%;
+      max-width: none;
+    }
+  }
+
+  .players-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  .players-list-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .step-actions {
+    flex-direction: column;
+
+    .btn {
       width: 100%;
     }
   }

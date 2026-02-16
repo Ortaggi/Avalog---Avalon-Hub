@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -18,7 +18,7 @@ import { Group } from '../../../../shared/models/groups';
 
 interface User {
   id: string;
-  displayName: string;
+  nickname: string;
 }
 
 interface PlayerSelection {
@@ -41,6 +41,7 @@ export class MatchCreateComponent implements OnInit {
   private groupService = inject(GroupService);
   private userService = inject(UsersService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   currentStep = 1;
 
@@ -56,7 +57,7 @@ export class MatchCreateComponent implements OnInit {
   notes = '';
 
   //Stati
-  isLoading = false;
+  isLoading = true;
   isSaving = false;
   errorMessage = '';
 
@@ -65,17 +66,25 @@ export class MatchCreateComponent implements OnInit {
   }
 
   private async loadGroups(): Promise<void> {
+    console.log('🔄 loadGroups: START - isLoading =', this.isLoading);
     this.isLoading = true;
     try {
+      console.log('👤 Getting current user...');
       const user = await this.authService.me();
+      console.log('👤 User:', user);
       if (user) {
+        console.log('📦 Getting groups for user:', user.id);
         this.groups = await this.groupService.getByUserId(user.id);
+        console.log('✅ Groups loaded:', this.groups);
       }
     } catch (error) {
-      console.error('Errore nel caricamento dei gruppi:', error);
+      console.error('❌ Errore nel caricamento dei gruppi:', error);
       this.errorMessage = 'Errore nel caricamento dei gruppi.';
     } finally {
+      console.log('✅ loadGroups: FINALLY - setting isLoading to false');
       this.isLoading = false;
+      this.cdr.detectChanges();
+      console.log('✅ loadGroups: END - isLoading =', this.isLoading);
     }
   }
 
@@ -95,7 +104,7 @@ export class MatchCreateComponent implements OnInit {
 
       if (group && group.members) {
         const users: PlayerSelection[] = group.members.map((member: any) => ({
-          user: { id: member.id, displayName: member.displayName },
+          user: { id: member.id, nickname: member.nickname },
           selected: false,
           roleId: '',
         }));
@@ -116,17 +125,20 @@ export class MatchCreateComponent implements OnInit {
   }
 
   isStep1Valid(): boolean {
-    const count = this.getSelectedPlayersCount();
-    console.log('isStep1Valid - groupId:', this.selectedGroupId, 'count:', count);
-    return !!this.selectedGroupId && count >= 4 && count <= 10;
+    return !!this.selectedGroupId;
   }
 
   isStep2Valid(): boolean {
+    const count = this.getSelectedPlayersCount();
+    return count >= 4 && count <= 10;
+  }
+
+  isStep3Valid(): boolean {
     const selectedPlayers = this.getSelectedPlayers();
     return selectedPlayers.every((p) => p.roleId !== '') && this.validateRoles();
   }
 
-  isStep3Valid(): boolean {
+  isStep4Valid(): boolean {
     return !!this.winningFaction && !!this.victoryType && !!this.matchDate;
   }
 
@@ -160,6 +172,8 @@ export class MatchCreateComponent implements OnInit {
       this.currentStep = 2;
     } else if (this.currentStep === 2 && this.isStep2Valid()) {
       this.currentStep = 3;
+    } else if (this.currentStep === 3 && this.isStep3Valid()) {
+      this.currentStep = 4;
     }
   }
 
@@ -180,11 +194,33 @@ export class MatchCreateComponent implements OnInit {
       this.currentStep = 2;
     } else if (step === 3 && this.isStep1Valid() && this.isStep2Valid()) {
       this.currentStep = 3;
+    } else if (step === 4 && this.isStep1Valid() && this.isStep2Valid() && this.isStep3Valid()) {
+      this.currentStep = 4;
     }
   }
 
+  getPlayersByFaction(faction: 'good' | 'evil'): PlayerSelection[] {
+    return this.getSelectedPlayers().filter((p) => this.getRoleFaction(p.roleId) === faction);
+  }
+
+  getPlayersWithoutRole(): PlayerSelection[] {
+    return this.getSelectedPlayers().filter((p) => !p.roleId);
+  }
+
+  getFactionPercentage(faction: 'good' | 'evil'): number {
+    const total = this.getSelectedPlayersCount();
+    if (total === 0) return 0;
+    const count = this.getPlayersByFaction(faction).length;
+    return Math.round((count / total) * 100);
+  }
+
+  getGroupName(): string {
+    const group = this.groups.find((g) => g.id === this.selectedGroupId);
+    return group?.name || '';
+  }
+
   async saveMatch(): Promise<void> {
-    if (!this.isStep3Valid()) return;
+    if (!this.isStep4Valid()) return;
 
     this.isSaving = true;
     this.errorMessage = '';
@@ -206,7 +242,7 @@ export class MatchCreateComponent implements OnInit {
           userId: p.user.id,
           role: p.roleId as GameRolesType,
           faction: (role?.faction as GameFactionType) || 'GOOD',
-          nickname: p.user.displayName,
+          nickname: p.user.nickname,
         };
       });
 

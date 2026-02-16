@@ -10,6 +10,15 @@ export const schemaGroups = {
       200: z.array(GroupResponse),
     },
   },
+  getByUserId: {
+    tags: ['Groups'],
+    description: 'Get groups by user id',
+    security: [{ BearerAuth: [] }],
+    params: z.object({ userId: z.uuid() }),
+    response: {
+      200: z.array(GroupResponse),
+    },
+  },
   getById: {
     tags: ['Groups'],
     description: 'Get group by id',

@@ -1,6 +1,7 @@
-<div class="match-create">
-  <div class="page-header mb-4">
-    <h1 class="page-title">Nuova Partita</h1>
+<div class="match-create container mt-4">
+  <div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title text-gold">✨ Nuova Partita</h1>
+    <a routerLink="/games" class="btn btn-outline-secondary">← Torna alle partite</a>
   </div>
 
   @if (isLoading) {
@@ -11,7 +12,7 @@
     </div>
   } @else {
     <!-- Progress Steps -->
-    <div class="steps-indicator mb-4">
+    <div class="steps-indicator mb-5">
       <div
         class="step"
         [class.active]="currentStep >= 1"
@@ -20,8 +21,14 @@
         tabindex="0"
         (keydown.enter)="goToStep(1)"
       >
-        <span class="step-number">1</span>
-        <span class="step-label">Giocatori</span>
+        <div class="step-circle">
+          @if (currentStep > 1) {
+            <span class="step-check">✓</span>
+          } @else {
+            <span class="step-number">1</span>
+          }
+        </div>
+        <span class="step-label">Gruppo</span>
       </div>
       <div class="step-connector" [class.active]="currentStep > 1"></div>
       <div
@@ -32,18 +39,44 @@
         tabindex="0"
         (keydown.enter)="goToStep(2)"
       >
-        <span class="step-number">2</span>
-        <span class="step-label">Ruoli</span>
+        <div class="step-circle">
+          @if (currentStep > 2) {
+            <span class="step-check">✓</span>
+          } @else {
+            <span class="step-number">2</span>
+          }
+        </div>
+        <span class="step-label">Giocatori</span>
       </div>
       <div class="step-connector" [class.active]="currentStep > 2"></div>
       <div
         class="step"
         [class.active]="currentStep >= 3"
+        [class.completed]="currentStep > 3"
         (click)="goToStep(3)"
         tabindex="0"
         (keydown.enter)="goToStep(3)"
       >
-        <span class="step-number">3</span>
+        <div class="step-circle">
+          @if (currentStep > 3) {
+            <span class="step-check">✓</span>
+          } @else {
+            <span class="step-number">3</span>
+          }
+        </div>
+        <span class="step-label">Ruoli</span>
+      </div>
+      <div class="step-connector" [class.active]="currentStep > 3"></div>
+      <div
+        class="step"
+        [class.active]="currentStep >= 4"
+        (click)="goToStep(4)"
+        tabindex="0"
+        (keydown.enter)="goToStep(4)"
+      >
+        <div class="step-circle">
+          <span class="step-number">4</span>
+        </div>
         <span class="step-label">Esito</span>
       </div>
     </div>
@@ -54,74 +87,51 @@
       </div>
     }
 
-    <!-- Step 1: Selezione Gruppo e Giocatori -->
+    <!-- Step 1: Selezione Gruppo -->
     @if (currentStep === 1) {
-      <div class="step-content">
-        <div class="card">
-          <div class="card-header">
-            <h3>Seleziona gruppo e giocatori</h3>
+      <div class="step-content fade-in">
+        <div class="card bg-medium-grey border border-light-grey">
+          <div class="card-header bg-dark-grey">
+            <h3 class="text-gold">🏰 Seleziona il Gruppo</h3>
+            <p class="text-light-muted mb-0">Scegli il gruppo per cui registrare la partita</p>
           </div>
           <div class="card-body">
-            <div class="mb-4">
-              <label for="groupSelect" class="form-label">Gruppo</label>
-              <select
-                id="groupSelect"
-                class="form-select"
-                [(ngModel)]="selectedGroupId"
-                (change)="onGroupChange()"
-              >
-                <option value="">Seleziona un gruppo...</option>
-                @for (group of groups; track group.id) {
-                  <option [value]="group.id">{{ group.name }}</option>
-                }
-              </select>
-            </div>
-
-            @if (players.length > 0) {
-              <div class="players-selection" aria-labelledby="playerLabel">
-                <p class="form-label" id="playerLabel">
-                  Giocatori ({{ getSelectedPlayersCount() }} selezionati, min 4 - max 10)
-                </p>
-                <div class="players-grid">
-                  @for (player of players; track player.user.id) {
-                    <div
-                      class="player-checkbox"
-                      [class.selected]="player.selected"
-                      (click)="player.selected = !player.selected"
-                      tabindex="0"
-                      (keydown.enter)="player.selected = !player.selected"
-                    >
-                      <input
-                        type="checkbox"
-                        [id]="'player-' + player.user.id"
-                        [(ngModel)]="player.selected"
-                        (click)="$event.stopPropagation()"
-                        tabindex="0"
-                        (keydown.enter)="$event.stopPropagation()"
-                      />
-                      <label [for]="'player-' + player.user.id">
-                        {{ player.user.displayName }}
-                      </label>
-                    </div>
+            @if (groups.length > 0) {
+              <div class="mb-4">
+                <label for="groupSelect" class="form-label">Gruppo</label>
+                <select
+                  id="groupSelect"
+                  class="form-select"
+                  [(ngModel)]="selectedGroupId"
+                  (change)="onGroupChange()"
+                >
+                  <option value="">🔽 Scegli un gruppo...</option>
+                  @for (group of groups; track group.id) {
+                    <option [value]="group.id">{{ group.name }}</option>
                   }
-                </div>
+                </select>
               </div>
-            }
 
-            @if (groups.length === 0) {
+              @if (selectedGroupId) {
+                <div class="alert alert-success">
+                  <strong>✓ Gruppo selezionato!</strong> Puoi procedere al prossimo step.
+                </div>
+              }
+            } @else {
               <div class="alert alert-warning">
-                Non fai parte di nessun gruppo.
-                <a routerLink="/groups">Crea o unisciti a un gruppo</a> per registrare partite.
+                ⚠️ Non fai parte di nessun gruppo.
+                <a routerLink="/groups" class="text-gold">Crea o unisciti a un gruppo</a> per
+                registrare partite.
               </div>
             }
           </div>
         </div>
 
         <div class="step-actions">
-          <a routerLink="/matches" class="btn btn-outline-secondary">Annulla</a>
+          <a routerLink="/games" class="btn btn-outline-secondary">Annulla</a>
           <button
             class="btn btn-primary"
-            [disabled]="!isStep1Valid()"
+            [disabled]="!selectedGroupId"
             (click)="nextStep()"
             tabindex="0"
             (keydown.enter)="nextStep()"
@@ -132,51 +142,228 @@
       </div>
     }
 
-    <!-- Step 2: Assegnazione Ruoli -->
+    <!-- Step 2: Selezione Giocatori -->
     @if (currentStep === 2) {
-      <div class="step-content">
-        <div class="card">
-          <div class="card-header">
-            <h3>Assegna i ruoli</h3>
+      <div class="step-content fade-in">
+        <div class="card bg-medium-grey border border-light-grey">
+          <div class="card-header bg-dark-grey">
+            <h3 class="text-gold">👥 Seleziona i Giocatori</h3>
+            <p class="text-light-muted mb-0">
+              Scegli chi ha partecipato alla partita (4-10 giocatori)
+            </p>
           </div>
           <div class="card-body">
-            <div class="roles-assignment">
-              @for (player of getSelectedPlayers(); track player.user.id) {
-                <div class="role-row">
-                  <span class="player-name">{{ player.user.displayName }}</span>
-                  <select
-                    [id]="'role-' + player.user.id"
-                    class="form-select role-select"
-                    [(ngModel)]="player.roleId"
+            @if (players.length > 0) {
+              <div class="players-selection" aria-labelledby="playerLabel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <p class="form-label mb-0" id="playerLabel">Giocatori disponibili</p>
+                  <span
+                    class="badge"
+                    [class.bg-success]="getSelectedPlayersCount() >= 4"
+                    [class.bg-warning]="getSelectedPlayersCount() < 4"
                   >
-                    <option value="">Seleziona ruolo...</option>
-                    <optgroup label="⚔️ Leali di Artù">
+                    {{ getSelectedPlayersCount() }}/10 selezionati
+                  </span>
+                </div>
+                <div class="players-grid">
+                  @for (player of players; track player.user.id) {
+                    <div
+                      class="player-card"
+                      [class.selected]="player.selected"
+                      (click)="player.selected = !player.selected"
+                      tabindex="0"
+                      (keydown.enter)="player.selected = !player.selected"
+                    >
+                      <div class="player-avatar">
+                        <span class="avatar-icon">👤</span>
+                        @if (player.selected) {
+                          <span class="checkmark">✓</span>
+                        }
+                      </div>
+                      <div class="player-info">
+                        <span class="player-name">{{ player.user.nickname }}</span>
+                        <span class="player-status">Online</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+                @if (getSelectedPlayersCount() < 4) {
+                  <div class="alert alert-warning mt-3">
+                    ⚠️ Servono almeno 4 giocatori per iniziare una partita
+                  </div>
+                } @else if (getSelectedPlayersCount() > 10) {
+                  <div class="alert alert-danger mt-3">❌ Massimo 10 giocatori per partita</div>
+                }
+              </div>
+            } @else {
+              <div class="alert alert-info">ℹ️ Nessun giocatore disponibile in questo gruppo</div>
+            }
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button
+            class="btn btn-outline-secondary"
+            (click)="prevStep()"
+            tabindex="0"
+            (keydown.enter)="prevStep()"
+          >
+            ← Indietro
+          </button>
+          <button
+            class="btn btn-primary"
+            [disabled]="getSelectedPlayersCount() < 4 || getSelectedPlayersCount() > 10"
+            (click)="nextStep()"
+            tabindex="0"
+            (keydown.enter)="nextStep()"
+          >
+            Avanti →
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Step 3: Assegnazione Ruoli -->
+    @if (currentStep === 3) {
+      <div class="step-content fade-in">
+        <div class="card bg-medium-grey border border-light-grey">
+          <div class="card-header bg-dark-grey">
+            <h3 class="text-gold">🎭 Assegna i Ruoli</h3>
+            <p class="text-light-muted mb-0">Assegna un ruolo ad ogni giocatore</p>
+          </div>
+          <div class="card-body">
+            <!-- Leali di Artù -->
+            <div class="faction-section mb-4">
+              <h4 class="faction-title good">⚔️ Leali di Artù</h4>
+              <div class="roles-assignment">
+                @for (player of getPlayersByFaction('good'); track player.user.id) {
+                  <div class="role-row">
+                    <div class="player-info-section">
+                      <span class="player-avatar-small">👤</span>
+                      <span class="player-name">{{ player.user.nickname }}</span>
+                    </div>
+                    <select
+                      [id]="'role-' + player.user.id"
+                      class="form-select role-select"
+                      [(ngModel)]="player.roleId"
+                    >
+                      <option value="">🔽 Seleziona ruolo...</option>
                       @for (role of getRolesForFaction('good'); track role.id) {
                         <option [value]="role.id">{{ role.name }}</option>
                       }
-                    </optgroup>
-                    <optgroup label="🗡️ Servitori di Mordred">
+                    </select>
+                    @if (player.roleId) {
+                      <span class="faction-badge good"> LEALE </span>
+                    }
+                  </div>
+                }
+                @if (getPlayersByFaction('good').length === 0) {
+                  <div class="empty-faction-message">
+                    <span class="text-light-muted">Nessun giocatore con ruolo buono ancora</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Servitori di Mordred -->
+            <div class="faction-section">
+              <h4 class="faction-title evil">🗡️ Servitori di Mordred</h4>
+              <div class="roles-assignment">
+                @for (player of getPlayersByFaction('evil'); track player.user.id) {
+                  <div class="role-row">
+                    <div class="player-info-section">
+                      <span class="player-avatar-small">👤</span>
+                      <span class="player-name">{{ player.user.nickname }}</span>
+                    </div>
+                    <select
+                      [id]="'role-' + player.user.id"
+                      class="form-select role-select"
+                      [(ngModel)]="player.roleId"
+                    >
+                      <option value="">🔽 Seleziona ruolo...</option>
                       @for (role of getRolesForFaction('evil'); track role.id) {
                         <option [value]="role.id">{{ role.name }}</option>
                       }
-                    </optgroup>
-                  </select>
-                  @if (player.roleId) {
-                    <span
-                      class="faction-badge"
-                      [class.good]="getRoleFaction(player.roleId) === 'good'"
-                      [class.evil]="getRoleFaction(player.roleId) === 'evil'"
-                    >
-                      {{ getRoleFaction(player.roleId) === 'good' ? 'Buono' : 'Cattivo' }}
-                    </span>
-                  }
-                </div>
-              }
+                    </select>
+                    @if (player.roleId) {
+                      <span class="faction-badge evil"> SERVITORE </span>
+                    }
+                  </div>
+                }
+                @if (getPlayersByFaction('evil').length === 0) {
+                  <div class="empty-faction-message">
+                    <span class="text-light-muted">Nessun giocatore con ruolo cattivo ancora</span>
+                  </div>
+                }
+              </div>
             </div>
 
+            <!-- Giocatori senza ruolo -->
+            @if (getPlayersWithoutRole().length > 0) {
+              <div class="faction-section mt-4">
+                <h4 class="faction-title text-warning">⏳ Senza Ruolo</h4>
+                <div class="roles-assignment">
+                  @for (player of getPlayersWithoutRole(); track player.user.id) {
+                    <div class="role-row">
+                      <div class="player-info-section">
+                        <span class="player-avatar-small">👤</span>
+                        <span class="player-name">{{ player.user.nickname }}</span>
+                      </div>
+                      <select
+                        [id]="'role-' + player.user.id"
+                        class="form-select role-select"
+                        [(ngModel)]="player.roleId"
+                      >
+                        <option value="">🔽 Seleziona ruolo...</option>
+                        <optgroup label="⚔️ Leali di Artù">
+                          @for (role of getRolesForFaction('good'); track role.id) {
+                            <option [value]="role.id">{{ role.name }}</option>
+                          }
+                        </optgroup>
+                        <optgroup label="🗡️ Servitori di Mordred">
+                          @for (role of getRolesForFaction('evil'); track role.id) {
+                            <option [value]="role.id">{{ role.name }}</option>
+                          }
+                        </optgroup>
+                      </select>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Balance indicator -->
+            @if (allPlayersHaveRoles()) {
+              <div class="faction-balance mt-4">
+                <p class="form-label">📊 Composizione Fazioni</p>
+                <div class="balance-bar">
+                  <div class="balance-good" [style.width.%]="getFactionPercentage('good')">
+                    <span class="balance-text"
+                      >{{ getPlayersByFaction('good').length }} Leali ({{
+                        getFactionPercentage('good')
+                      }}%)</span
+                    >
+                  </div>
+                  <div class="balance-evil" [style.width.%]="getFactionPercentage('evil')">
+                    <span class="balance-text"
+                      >{{ getPlayersByFaction('evil').length }} Servitori ({{
+                        getFactionPercentage('evil')
+                      }}%)</span
+                    >
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- Validazione -->
             @if (!validateRoles() && allPlayersHaveRoles()) {
               <div class="alert alert-warning mt-3">
                 ⚠️ Attenzione: alcuni ruoli unici sono stati assegnati più volte.
+              </div>
+            }
+            @if (!allPlayersHaveRoles()) {
+              <div class="alert alert-info mt-3">
+                ℹ️ Tutti i giocatori devono avere un ruolo assegnato
               </div>
             }
           </div>
@@ -193,7 +380,7 @@
           </button>
           <button
             class="btn btn-primary"
-            [disabled]="!isStep2Valid()"
+            [disabled]="!isStep3Valid()"
             (click)="nextStep()"
             tabindex="0"
             (keydown.enter)="nextStep()"
@@ -204,119 +391,162 @@
       </div>
     }
 
-    <!-- Step 3: Esito -->
-    @if (currentStep === 3) {
-      <div class="step-content">
-        <div class="card">
-          <div class="card-header">
-            <h3>Esito della partita</h3>
+    <!-- Step 4: Esito -->
+    @if (currentStep === 4) {
+      <div class="step-content fade-in">
+        <div class="card bg-medium-grey border border-light-grey">
+          <div class="card-header bg-dark-grey">
+            <h3 class="text-gold">🏆 Com'è Finita?</h3>
+            <p class="text-light-muted mb-0">Inserisci i dettagli dell'esito della partita</p>
           </div>
           <div class="card-body">
             <div class="mb-4">
-              <label for="matchDate" class="form-label">Data partita</label>
+              <label for="matchDate" class="form-label">📅 Data della partita</label>
               <input type="date" id="matchDate" class="form-control" [(ngModel)]="matchDate" />
             </div>
 
             <div class="mb-4">
-              <p class="form-label" id="factionLabel">Fazione vincente</p>
+              <p class="form-label" id="factionLabel">👑 Chi ha vinto?</p>
               <div class="faction-selection" role="radiogroup" aria-labelledby="factionLabel">
                 <div
-                  class="faction-option good"
+                  class="faction-card good"
                   [class.selected]="winningFaction === 'good'"
                   (click)="winningFaction = 'good'"
                   tabindex="0"
                   (keydown.enter)="winningFaction = 'good'"
                 >
-                  <span class="faction-icon">⚔️</span>
-                  <span class="faction-name">Leali di Artù</span>
+                  <div class="faction-icon-large">⚔️</div>
+                  <div class="faction-name">Leali di Artù</div>
+                  @if (winningFaction === 'good') {
+                    <div class="selected-indicator">✓ SELEZIONATO</div>
+                  }
                 </div>
                 <div
-                  class="faction-option evil"
+                  class="faction-card evil"
                   [class.selected]="winningFaction === 'evil'"
                   (click)="winningFaction = 'evil'"
                   tabindex="0"
                   (keydown.enter)="winningFaction = 'evil'"
                 >
-                  <span class="faction-icon">🗡️</span>
-                  <span class="faction-name">Servitori di Mordred</span>
+                  <div class="faction-icon-large">🗡️</div>
+                  <div class="faction-name">Servitori di Mordred</div>
+                  @if (winningFaction === 'evil') {
+                    <div class="selected-indicator">✓ SELEZIONATO</div>
+                  }
                 </div>
               </div>
             </div>
 
             <div class="mb-4">
-              <p class="form-label" id="victoryLabel">Tipo di vittoria</p>
+              <p class="form-label" id="victoryLabel">🏆 Come hanno vinto?</p>
               <div class="victory-selection" role="radiogroup" aria-labelledby="victoryLabel">
                 <div
-                  class="victory-option"
+                  class="victory-card"
                   [class.selected]="victoryType === 'missions'"
                   (click)="victoryType = 'missions'"
                   tabindex="0"
                   (keydown.enter)="victoryType = 'missions'"
                 >
-                  <span class="victory-icon">🏰</span>
-                  <span class="victory-name">3 Missioni completate</span>
+                  <div class="victory-icon-large">🎯</div>
+                  <div class="victory-name">Tre Missioni</div>
+                  <div class="victory-description">3 missioni fallite/completate</div>
+                  @if (victoryType === 'missions') {
+                    <div class="selected-indicator">✓ SELEZIONATO</div>
+                  }
                 </div>
                 <div
-                  class="victory-option"
+                  class="victory-card"
                   [class.selected]="victoryType === 'assassination'"
                   (click)="victoryType = 'assassination'"
                   tabindex="0"
                   (keydown.enter)="victoryType = 'assassination'"
                 >
-                  <span class="victory-icon">🗡️</span>
-                  <span class="victory-name">Assassinio di Merlino</span>
+                  <div class="victory-icon-large">🗡️</div>
+                  <div class="victory-name">Assassinio</div>
+                  <div class="victory-description">Merlino è stato ucciso</div>
+                  @if (victoryType === 'assassination') {
+                    <div class="selected-indicator">✓ SELEZIONATO</div>
+                  }
                 </div>
               </div>
             </div>
 
             <div class="mb-4">
-              <label for="notes" class="form-label">Note (opzionale)</label>
+              <label for="notes" class="form-label">📝 Note (opzionale)</label>
               <textarea
                 id="notes"
                 class="form-control"
                 rows="3"
                 [(ngModel)]="notes"
-                placeholder="Aggiungi note sulla partita..."
+                placeholder="Aggiungi note sulla partita, momenti memorabili, strategie utilizzate..."
               ></textarea>
             </div>
           </div>
         </div>
 
         <!-- Riepilogo -->
-        <div class="card mt-4">
-          <div class="card-header">
-            <h3>Riepilogo</h3>
+        <div class="card bg-medium-grey border border-gold mt-4">
+          <div class="card-header bg-dark-grey">
+            <h3 class="text-gold">📋 Riepilogo Finale</h3>
           </div>
           <div class="card-body">
             <div class="summary-grid">
               <div class="summary-item">
-                <span class="summary-label">Giocatori</span>
-                <span class="summary-value">{{ getSelectedPlayersCount() }}</span>
+                <span class="summary-icon">🏰</span>
+                <div class="summary-content">
+                  <span class="summary-label">Gruppo</span>
+                  <span class="summary-value">{{ getGroupName() }}</span>
+                </div>
               </div>
               <div class="summary-item">
-                <span class="summary-label">Data</span>
-                <span class="summary-value">{{ matchDate | date: 'dd/MM/yyyy' }}</span>
+                <span class="summary-icon">📅</span>
+                <div class="summary-content">
+                  <span class="summary-label">Data</span>
+                  <span class="summary-value">{{ matchDate | date: 'dd/MM/yyyy' }}</span>
+                </div>
               </div>
               <div class="summary-item">
-                <span class="summary-label">Vincitori</span>
-                <span
-                  class="summary-value"
-                  [class.good]="winningFaction === 'good'"
-                  [class.evil]="winningFaction === 'evil'"
-                >
-                  {{ winningFaction === 'good' ? 'Leali di Artù' : 'Servitori di Mordred' }}
-                </span>
+                <span class="summary-icon">👥</span>
+                <div class="summary-content">
+                  <span class="summary-label">Giocatori</span>
+                  <span class="summary-value">{{ getSelectedPlayersCount() }}</span>
+                </div>
+              </div>
+              <div class="summary-item">
+                <span class="summary-icon">👑</span>
+                <div class="summary-content">
+                  <span class="summary-label">Vincitori</span>
+                  <span
+                    class="summary-value"
+                    [class.text-good]="winningFaction === 'good'"
+                    [class.text-evil]="winningFaction === 'evil'"
+                  >
+                    {{ winningFaction === 'good' ? '⚔️ Leali di Artù' : '🗡️ Servitori di Mordred' }}
+                  </span>
+                </div>
+              </div>
+              <div class="summary-item">
+                <span class="summary-icon">🏆</span>
+                <div class="summary-content">
+                  <span class="summary-label">Modalità</span>
+                  <span class="summary-value">{{
+                    victoryType === 'missions' ? '🎯 Tre Missioni' : '🗡️ Assassinio'
+                  }}</span>
+                </div>
               </div>
             </div>
 
-            <div class="players-summary mt-3">
-              <h4>Giocatori e ruoli:</h4>
-              <div class="players-list">
+            <div class="players-summary mt-4">
+              <h4 class="text-gold mb-3">👥 Giocatori e Ruoli</h4>
+              <div class="players-list-summary">
                 @for (player of getSelectedPlayers(); track player.user.id) {
-                  <div class="player-summary-item">
-                    <span class="player-name">{{ player.user.displayName }}</span>
+                  <div class="player-summary-card">
+                    <div class="player-summary-info">
+                      <span class="player-avatar-small">👤</span>
+                      <span class="player-name">{{ player.user.nickname }}</span>
+                    </div>
                     <span
-                      class="role-badge"
+                      class="role-badge-large"
                       [class.good]="getRoleFaction(player.roleId) === 'good'"
                       [class.evil]="getRoleFaction(player.roleId) === 'evil'"
                     >
@@ -339,17 +569,17 @@
             ← Indietro
           </button>
           <button
-            class="btn btn-success"
-            [disabled]="!isStep3Valid() || isSaving"
+            class="btn btn-success btn-lg save-button"
+            [disabled]="!isStep4Valid() || isSaving"
             (click)="saveMatch()"
             tabindex="0"
             (keydown.enter)="saveMatch()"
           >
             @if (isSaving) {
               <span class="spinner-border spinner-border-sm me-2"></span>
-              Salvataggio...
+              Salvataggio in corso...
             } @else {
-              Salva Partita
+              ✓ Salva Partita
             }
           </button>
         </div>

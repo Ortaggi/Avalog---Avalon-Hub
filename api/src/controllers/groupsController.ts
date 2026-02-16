@@ -8,6 +8,22 @@ export async function getGroups() {
   });
 }
 
+export async function getGroupsByUserId(userId: string) {
+  const memberships = await prisma.membership.findMany({
+    where: { userId },
+    select: {
+      group: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  return memberships.map((m) => m.group);
+}
+
 export async function createGroup(data: GroupRequestType) {
   return prisma.group.create({
     data: {
