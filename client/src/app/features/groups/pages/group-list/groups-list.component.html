@@ -1,0 +1,35 @@
+<div class="container mt-4">
+  <div class="page-header d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-title text-gold">👥 I Miei Gruppi</h1>
+    <button class="btn btn-primary">+ Nuovo Gruppo</button>
+  </div>
+
+  @if (isLoading) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-gold" role="status">
+        <span class="visually-hidden">Caricamento...</span>
+      </div>
+    </div>
+  } @else if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  } @else if (groups.length === 0) {
+    <div class="alert alert-info">
+      Non fai ancora parte di nessun gruppo. Crea il tuo primo gruppo!
+    </div>
+  } @else {
+    <div class="row">
+      @for (group of groups; track group.id) {
+        <div class="col-md-4 mb-4">
+          <div class="card bg-medium-grey border border-light-grey">
+            <div class="card-body">
+              <h5 class="card-title text-gold">{{ group.name }}</h5>
+              <a [routerLink]="['/groups', group.id]" class="btn btn-outline-primary">
+                Vedi dettagli
+              </a>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

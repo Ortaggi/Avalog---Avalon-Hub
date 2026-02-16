@@ -40,6 +40,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'groups',
+        loadComponent: () =>
+          import('./features/groups/pages/group-list/groups-list.component').then(
+            (m) => m.GroupsListComponent,
+          ),
+      },
+      {
         path: 'games',
         loadComponent: () =>
           import('./features/matches/pages/matches-list/matches-list.component').then(
