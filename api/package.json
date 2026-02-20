@@ -8,7 +8,9 @@
     "start": "npm run build && fastify start -l info -P src/server.js",
     "build": "tsc",
     "migrate": "prisma migrate dev",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "seed": "tsx prisma/seed.ts",
+    "db:reset": "tsx prisma/reset.ts"
   },
   "type": "module",
   "keywords": [],
