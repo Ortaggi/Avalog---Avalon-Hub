@@ -146,8 +146,8 @@ export class MatchCreateComponent implements OnInit {
     const selectedPlayers = this.getSelectedPlayers();
     const selectedRoles = selectedPlayers.map((p) => p.roleId);
 
-    // Verifica che non ci siano ruoli duplicati (eccetto loyal e minion)
-    const uniqueRoles = selectedRoles.filter((r) => r !== 'loyal' && r !== 'minion');
+    // Verifica che non ci siano ruoli duplicati (eccetto GOOD_SIMPLE e EVIL_SIMPLE)
+    const uniqueRoles = selectedRoles.filter((r) => r !== 'GOOD_SIMPLE' && r !== 'EVIL_SIMPLE');
     const uniqueSet = new Set(uniqueRoles);
 
     return uniqueRoles.length === uniqueSet.size;
