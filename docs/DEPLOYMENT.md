@@ -1,157 +1,195 @@
 # Guida al Deploy - Avalog
 
-Questa guida descrive come deployare Avalog su un server con Nginx.
-
 ---
 
-## Architettura Deploy
+## Architettura
+
+Il progetto è distribuito come **singolo container Docker** che include:
+- **Nginx** (porta 80) — serve il frontend e fa da reverse proxy all'API
+- **Fastify API** (porta 8000, solo interna) — backend Node.js
+- **Supervisor** — gestisce i processi nginx e API
+
+Il database PostgreSQL gira in un container separato.
+
 ```
-┌─────────────┐     push      ┌─────────────────┐
-│   GitHub    │ ───────────▶  │  GitHub Actions │
-│   (main)    │               │    (CI/CD)      │
-└─────────────┘               └────────┬────────┘
-                                       │
-                                       │ rsync via SSH
-                                       ▼
-                              ┌─────────────────┐
-                              │    Hostinger    │
-                              │  (Nginx + App)  │
-                              └─────────────────┘
-```
+[ Browser ]
+     │
+     ▼
+[ Nginx :80 ]
+     ├── /api/v0/** ──▶ Fastify :8000 (interno)
+     └── /**        ──▶ Angular build (static files)
 
----
-
-## Prerequisiti
-
-- Server con accesso SSH
-- Nginx installato
-- Dominio configurato
-- Account GitHub con accesso al repository
-
----
-
-## Setup Iniziale Server
-
-### 1. Crea la cartella per l'app
-```bash
-ssh user@tuo-server
-mkdir -p /var/www/avalog
-```
-
-### 2. Configura Nginx
-```bash
-sudo nano /etc/nginx/sites-available/avalog
-```
-```nginx
-server {
-    listen 80;
-    server_name tuodominio.com www.tuodominio.com;
-    root /var/www/avalog;
-    index index.html;
-
-    # Gzip compression
-    gzip on;
-    gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
-
-    # Angular routing
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    # Cache static assets
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
-        expires 1y;
-        add_header Cache-Control "public, immutable";
-    }
-}
-```
-
-### 3. Abilita il sito
-```bash
-sudo ln -s /etc/nginx/sites-available/avalog /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
-```
-
-### 4. (Opzionale) HTTPS con Let's Encrypt
-```bash
-sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d tuodominio.com -d www.tuodominio.com
+[ PostgreSQL :5432 ] ◀──── Fastify (via Prisma)
 ```
 
 ---
 
-## Setup GitHub Actions
+## Deploy Locale (Docker)
 
-### 1. Genera chiave SSH per deploy
+### Prerequisiti
+- Docker e Docker Compose installati
+- Nessun processo in ascolto su porta 80 e 5432
+
+### 1. Build dell'immagine
+
 ```bash
-ssh-keygen -t ed25519 -C "github-actions-avalog" -f ~/.ssh/avalog_deploy_key
+docker build --platform linux/amd64 -t avalog/api:latest .
 ```
 
-### 2. Aggiungi chiave pubblica sul server
+> Il flag `--platform linux/amd64` garantisce compatibilità con il server remoto.
+
+### 2. Avvia i container
+
 ```bash
-cat ~/.ssh/avalog_deploy_key.pub >> ~/.ssh/authorized_keys
+docker compose up -d
 ```
 
-### 3. Configura secrets su GitHub
+Questo avvia:
+- `avalog_postgres` — PostgreSQL su porta 5432
+- `avalog_api` — Nginx + API su porta 80
 
-Vai su GitHub → Repository → Settings → Secrets → Actions
+### 3. Verifica
 
-| Secret | Valore                                                |
-|--------|-------------------------------------------------------|
-| `SSH_PRIVATE_KEY` | Contenuto di `avalog_deploy_key` codificato in base64 |
-| `SSH_HOST` | IP o dominio del server                               |
-| `SSH_USER` | Username SSH                                          |
-| `DEPLOY_PATH` | `/var/www/avalog-fe`                                  |
+```bash
+# Controlla che i container siano su
+docker ps
+
+# Controlla i log
+docker logs avalog_api
+docker logs avalog_postgres
+
+# Testa l'API
+curl http://localhost/api/v0/auth/me
+```
+
+### 4. Connessione al database
+
+```bash
+docker exec -it avalog_postgres psql -U avalog -d avalog
+```
+
+### 5. Ferma i container
+
+```bash
+docker compose down
+
+# Per rimuovere anche i volumi (reset DB)
+docker compose down -v
+```
 
 ---
 
-## Pipeline CI/CD
+## Sviluppo Frontend (fuori Docker)
 
-Il file `.github/workflows/deploy.yml` esegue:
+Per sviluppare il frontend con hot reload, avvia il dev server Angular separatamente.
+Il `proxy.conf.json` reindirizza le chiamate API al container Docker.
 
-1. **Checkout** — Scarica il codice
-2. **Setup Node.js** — Installa Node 20
-3. **Install dependencies** — `npm ci`
-4. **Build** — `ng build --configuration=production`
-5. **Deploy** — rsync dei file su server via SSH
+```bash
+cd client
+npm start
+# App disponibile su http://localhost:4200
+# Le chiamate /api/** vengono proxate verso http://localhost:80
+```
 
-### Trigger
-
-Il deploy si attiva automaticamente ad ogni push su `main`.
+Assicurati che il container `avalog_api` sia in esecuzione prima di avviare il dev server.
 
 ---
 
-## Deploy Manuale
+## Deploy Remoto
 
-Se necessario, puoi deployare manualmente:
+### Metodo 1: Script manuale (`build_and_deploy.sh`)
+
+Deploya l'intera applicazione (frontend + backend) come immagine Docker sul server remoto.
+
+**Prerequisiti:**
+- Accesso SSH configurato verso `root@avalog.online`
+- Docker installato sul server remoto
+- Docker Compose configurato sul server remoto
+
+**Procedura:**
+
 ```bash
-# Build locale
-cd avalog-fe
-ng build
-
-# Upload via rsync
-rsync -avz --delete \
-  dist/avalog-fe/browser/ \
-  user@server:/var/www/avalog-fe/
+# Dalla root del progetto
+./build_and_deploy.sh
 ```
+
+Lo script esegue in sequenza:
+1. Build dell'immagine Docker (`linux/amd64`)
+2. Salva l'immagine e la invia via SSH al server remoto con gzip
+3. Il server carica l'immagine localmente
+
+**Dopo lo script**, accedi al server e riavvia i container:
+
+```bash
+ssh root@avalog.online
+cd /path/to/project
+docker compose up -d
+```
+
+---
+
+### Metodo 2: GitHub Actions (automatico)
+
+Si attiva automaticamente alla **pubblicazione di una release** su GitHub.
+
+**Cosa fa:**
+1. Checkout del codice
+2. Build Angular (`ng build`)
+3. Deploy dei file statici via `rsync` su SSH
+
+**Secrets richiesti** (configurare in GitHub → Settings → Secrets → Actions):
+
+| Secret | Descrizione |
+|--------|-------------|
+| `SSH_PRIVATE_KEY` | Chiave SSH privata per accesso al server |
+| `SSH_HOST` | IP o dominio del server |
+| `SSH_USER` | Username SSH |
+| `DEPLOY_PATH` | Percorso destinazione sul server (es. `/var/www/avalog`) |
+| `NG_APP_ENV` | Environment Angular per la build |
+| `NG_APP_SERVER_TYPE` | Tipo di server (es. `backend`) |
+
+**Come triggerare il deploy:**
+1. Vai su GitHub → Releases → "Draft a new release"
+2. Crea un tag (es. `v1.2.0`) e pubblica la release
+3. GitHub Actions parte automaticamente
+
+**Monitora il deploy:**
+- GitHub → Actions → workflow "Deploy to Hostinger"
 
 ---
 
 ## Troubleshooting
 
-### Build fallisce
-- Verifica che `ng build` funzioni localmente
-- Controlla i log di GitHub Actions
+### Container non si avvia
+```bash
+docker logs avalog_api
+docker logs avalog_postgres
+```
 
-### Deploy fallisce (SSH)
-- Verifica che la chiave SSH sia corretta
-- Controlla che l'utente abbia permessi sulla cartella
+### API non risponde
+```bash
+# Verifica che nginx stia girando nel container
+docker exec avalog_api nginx -t
 
-### App non funziona dopo deploy
-- Verifica la configurazione Nginx
-- Controlla che `try_files` sia configurato per Angular routing
-- Verifica i permessi della cartella `/var/www/avalog-fe`
+# Verifica che Fastify stia girando
+docker exec avalog_api ps aux | grep node
+```
 
-### 404 sulle route
-- Assicurati che Nginx abbia `try_files $uri $uri/ /index.html;`
+### Database non raggiungibile
+```bash
+# Verifica che postgres sia healthy
+docker ps | grep postgres
+
+# Testa la connessione
+docker exec avalog_postgres pg_isready -U avalog
+```
+
+### Loader bloccato nel frontend (Angular)
+Se dopo una chiamata API il loader rimane attivo, usare `ChangeDetectorRef`:
+```typescript
+private cdr = inject(ChangeDetectorRef);
+
+// Nel blocco finally:
+this.isLoading = false;
+this.cdr.detectChanges();
+```
